@@ -9,7 +9,7 @@ public class ExampleTest : MonoBehaviour
     public RenderTexture rTex;
     public Material mat;
 
-    public Texture2D texture = new Texture2D(1, 1);
+    public Texture2D texture;
 
     public Texture2D writeTex;
     bool mousePressed = false;
