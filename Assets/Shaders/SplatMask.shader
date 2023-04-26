@@ -62,14 +62,17 @@ Shader "Unlit/SplatMask"
 
             float4 frag(v2f i) : COLOR
             {
-                _Radius = .1;
-                _Hardness = .3;
-                _Strength = .3;
 
                 float4 col = tex2D(_MainTex, i.uv);
-                float f = mask(i.uv, _SplatPos, _Radius, _Hardness);
-                float edge = f * _Strength;
-                return lerp(col, _InkColor, edge);
+
+                float size = _Radius;
+                float soft = _Hardness;
+                float f = distance(_SplatPos, i.uv);
+
+                f = 1 - smoothstep(size * soft, size, f);
+                col = lerp(col, _InkColor, f * _Strength);
+                //col = saturate(col);
+                return col;
             }
             ENDCG
         }

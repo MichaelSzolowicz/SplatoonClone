@@ -5,7 +5,6 @@ using System.Collections;
 
 public class PixelReader : MonoBehaviour
 {
-    public Texture2D brush;
     public RenderTexture splatmap;
 
 
@@ -24,7 +23,6 @@ public class PixelReader : MonoBehaviour
     protected void Start()
     {
         Application.targetFrameRate = -1;
-        BlitBrush();
 
         StartCoroutine(ReadPixelContinous());
     }
@@ -52,14 +50,6 @@ public class PixelReader : MonoBehaviour
     }
 
     /// <summary>
-    /// Test only. Draw a Texture2D brush to RenderTexture splatmap.
-    /// </summary>
-    protected void BlitBrush()
-    {
-        Graphics.Blit(brush, splatmap);
-    }
-
-    /// <summary>
     /// Projects mouse position to splatmap uv space.
     /// </summary>
     /// <param name="textureCoords">Store the ouput coordinates.</param>
@@ -72,16 +62,20 @@ public class PixelReader : MonoBehaviour
         bool bHit = Physics.Raycast(mouseRay, out hit, Mathf.Infinity);
 
 
-        if (bHit)
-        {
-            textureCoords = hit.textureCoord;
-            textureCoords.x *= splatmap.width;
-            textureCoords.y *= splatmap.height;
+        if (!bHit) return false;
 
-            return true;
-        }
+        if (!hit.transform.GetComponent<SplatableObject>()) return false;
 
-        return false;
+
+        splatmap = hit.transform.GetComponent<SplatableObject>().splatmap;
+
+        if (!splatmap) return false;
+
+        textureCoords = hit.textureCoord;
+        textureCoords.x *= splatmap.width;
+        textureCoords.y *= splatmap.height;
+
+        return true;
     }
 
     void OnCompleteReadback(AsyncGPUReadbackRequest request)

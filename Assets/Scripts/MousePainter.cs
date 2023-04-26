@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class MousePainter : MonoBehaviour
 {
-    void Start()
-    {
-
-    }
+    public Color inkColor;
+    public float radius, hardness, strength;
 
     void Update()
     {
@@ -32,7 +30,7 @@ public class MousePainter : MonoBehaviour
         SplatableObject splatObject = hit.transform.GetComponent<SplatableObject>();
         if (!splatObject) return;
 
-        splatObject.DrawSplat(hit.textureCoord, .1f, .1f, .1f);
+        splatObject.DrawSplat(hit.textureCoord, radius, hardness, strength, inkColor);
 
         
     }
