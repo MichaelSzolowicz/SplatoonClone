@@ -7,7 +7,7 @@ Shader "Unlit/SplatMask"
     }
         SubShader
     {
-        Tags { "RenderType" = "Opaque" }
+        Cull Off ZWrite Off ZTest Off
 
         Pass
         {
@@ -21,7 +21,7 @@ Shader "Unlit/SplatMask"
             float4 _MainTex_ST;
 
 
-            float2 _SplatPos;
+            float3 _SplatPos;
             float _Radius;
             float _Hardness;
             float _Strength;
@@ -32,8 +32,7 @@ Shader "Unlit/SplatMask"
             struct appdata
             {
                 float4 vertex : POSITION;
-                float2 uv0 : TEXCOORD0;
-                float3 normal : NORMAL;
+                float2 uv : TEXCOORD0;
             };
 
 
@@ -41,38 +40,32 @@ Shader "Unlit/SplatMask"
             struct v2f
             {
                 float4 vertex : SV_POSITION;
-                float3 normal : TEXCOORD0;
+                float4 worldPos : TEXCOORD0;
                 float2 uv : TEXCOORD1;
             };
 
             v2f vert(appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.normal = v.normal; // Just passing data from the vert to frag shader.
-                o.normal = UnityObjectToWorldNormal(v.normal);
-                o.uv = v.uv0;
+                o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+                o.uv = v.uv;
+                float4 uv = (0, 0, 0, 1);
+                uv.xy = (v.uv.xy * 2 - 1) * float2(1, _ProjectionParams.x);
+                o.vertex = uv;
                 return o;
             }
 
-            float mask(float2 pos, float2 center, float radius, float hardness) {
-                float m = distance(center, pos);
+            float mask(float3 pos, float3 center, float radius, float hardness) {
+                float m = distance(pos, center);
                 return 1 - smoothstep(radius * hardness, radius, m);
             }
 
             float4 frag(v2f i) : COLOR
             {
-
                 float4 col = tex2D(_MainTex, i.uv);
-
-                float size = _Radius;
-                float soft = _Hardness;
-                float f = distance(_SplatPos, i.uv);
-
-                f = 1 - smoothstep(size * soft, size, f);
-                col = lerp(col, _InkColor, f * _Strength);
-                //col = saturate(col);
-                return col;
+                float m = mask(i.worldPos, _SplatPos, _Radius, _Hardness);
+                float edge = m * _Strength;
+                return lerp(col, _InkColor, edge);
             }
             ENDCG
         }

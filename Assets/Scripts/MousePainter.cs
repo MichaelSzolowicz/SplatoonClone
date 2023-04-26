@@ -30,7 +30,9 @@ public class MousePainter : MonoBehaviour
         SplatableObject splatObject = hit.transform.GetComponent<SplatableObject>();
         if (!splatObject) return;
 
-        splatObject.DrawSplat(hit.textureCoord, radius, hardness, strength, inkColor);
+        print(hit.point);
+
+        splatObject.DrawSplat(hit.point, radius, hardness, strength, inkColor);
 
         
     }

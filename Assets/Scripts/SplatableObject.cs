@@ -7,6 +7,10 @@ public class SplatableObject : MonoBehaviour
 {
     private RenderTexture splatmap;
 
+    // Used to blit newly drawn ink on top of the existing inking. The mobile/particle/additive material works well for this.
+    [SerializeField]
+    protected Material alphaCombiner;
+
     public RenderTexture Splatmap
     {
         get { return splatmap; }
@@ -27,12 +31,12 @@ public class SplatableObject : MonoBehaviour
         RenderTexture temp = RenderTexture.GetTemporary(1024, 1024);
         Graphics.CopyTexture(temp, splatmap);
         RenderTexture.ReleaseTemporary(temp);
-        thisMaterial.SetTexture("splatmap", splatmap);
+        thisMaterial.SetTexture("_Splatmap", splatmap);
 
         
     }
 
-    public void DrawSplat(Vector2 uvPos, float radius, float hardness, float strength, Color inkColor)
+    public void DrawSplat(Vector3 uvPos, float radius, float hardness, float strength, Color inkColor)
     {
         splatMaterial.SetFloat(Shader.PropertyToID("_Radius"), radius);
         splatMaterial.SetFloat(Shader.PropertyToID("_Hardness"), hardness);
@@ -42,12 +46,14 @@ public class SplatableObject : MonoBehaviour
 
         CommandBuffer cmd = new CommandBuffer();
 
-        RenderTexture temp = RenderTexture.GetTemporary(splatmap.width, splatmap.height);
-        cmd.Blit(splatmap, temp);
-        cmd.Blit(temp, splatmap, splatMaterial);
+        RenderTexture temp = RenderTexture.GetTemporary(splatmap.width, splatmap.height, 0);
+        cmd.SetRenderTarget(temp);
+        cmd.DrawRenderer(GetComponent<Renderer>(), splatMaterial, 0);
 
+        cmd.Blit(temp, splatmap, alphaCombiner);
+        
         Graphics.ExecuteCommandBuffer(cmd);
-
         RenderTexture.ReleaseTemporary(temp);
+
     }
 }

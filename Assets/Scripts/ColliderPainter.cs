@@ -8,13 +8,8 @@ public class ColliderPainter : MonoBehaviour
     {
         print("collision");
 
-        Ray ray = new Ray(transform.position, collision.GetContact(0).point - transform.position);
-        RaycastHit hit;
-        bool isValidHit = collision.collider.Raycast(ray, out hit, 500);
+        if (!collision.transform.GetComponent<SplatableObject>()) return;
 
-        if (!isValidHit) return;
-        if (!hit.transform.GetComponent<SplatableObject>()) return;
-
-        hit.transform.GetComponent<SplatableObject>().DrawSplat(hit.textureCoord, .05f, .7f, 1, new Color(1, 0, 0, 1));
+        collision.transform.GetComponent<SplatableObject>().DrawSplat(collision.GetContact(0).point, .5f, .7f, .9f, new Color(1, 0, 0, 1));
     }
 }

@@ -4653,7 +4653,7 @@
     },
     "m_Name": "splatmap",
     "m_DefaultReferenceName": "Texture2D_e8340a2afea5458f9edc914beb601c62",
-    "m_OverrideReferenceName": "splatmap",
+    "m_OverrideReferenceName": "_Splatmap",
     "m_GeneratePropertyBlock": true,
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,

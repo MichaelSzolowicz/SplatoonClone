@@ -104,7 +104,7 @@ Shader "Custom/InkableSurfaceShader"
             
 
             float3 distortion;
-            distortion = UnpackScaleNormal(tex2D(_Normal, IN.uv_Normal), .1);
+            distortion = UnpackScaleNormal(tex2D(_Normal, IN.uv_Normal), .5);
             
             
 
