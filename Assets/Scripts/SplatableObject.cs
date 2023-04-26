@@ -5,20 +5,31 @@ using UnityEngine.Rendering;
 
 public class SplatableObject : MonoBehaviour
 {
-    public RenderTexture splatmap;
+    private RenderTexture splatmap;
+
+    public RenderTexture Splatmap
+    {
+        get { return splatmap; }
+    }
 
     private Material splatMaterial;
     private Material thisMaterial;
 
-    void Awake()
+    void Start()
     {
-        splatmap = new RenderTexture(1024, 1024, 32, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+        splatmap = new RenderTexture(1024, 1024, 0);
         splatMaterial = new Material(Shader.Find("Unlit/SplatMask"));
         //splatmap.useMipMap = true;
         //splatmap.GenerateMips();
 
         thisMaterial = GetComponent<Renderer>().material;
-        thisMaterial.SetTexture("_Splatmap", splatmap);
+
+        RenderTexture temp = RenderTexture.GetTemporary(1024, 1024);
+        Graphics.CopyTexture(temp, splatmap);
+        RenderTexture.ReleaseTemporary(temp);
+        thisMaterial.SetTexture("splatmap", splatmap);
+
+        
     }
 
     public void DrawSplat(Vector2 uvPos, float radius, float hardness, float strength, Color inkColor)
@@ -29,9 +40,14 @@ public class SplatableObject : MonoBehaviour
         splatMaterial.SetVector(Shader.PropertyToID("_SplatPos"), uvPos);
         splatMaterial.SetVector(Shader.PropertyToID("_InkColor"), inkColor);
 
+        CommandBuffer cmd = new CommandBuffer();
+
         RenderTexture temp = RenderTexture.GetTemporary(splatmap.width, splatmap.height);
-        Graphics.Blit(splatmap, temp);
-        Graphics.Blit(temp, splatmap, splatMaterial);
+        cmd.Blit(splatmap, temp);
+        cmd.Blit(temp, splatmap, splatMaterial);
+
+        Graphics.ExecuteCommandBuffer(cmd);
+
         RenderTexture.ReleaseTemporary(temp);
     }
 }

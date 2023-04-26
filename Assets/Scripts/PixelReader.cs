@@ -5,7 +5,7 @@ using System.Collections;
 
 public class PixelReader : MonoBehaviour
 {
-    public RenderTexture splatmap;
+    private RenderTexture splatmap;
 
 
     // Start
@@ -67,7 +67,7 @@ public class PixelReader : MonoBehaviour
         if (!hit.transform.GetComponent<SplatableObject>()) return false;
 
 
-        splatmap = hit.transform.GetComponent<SplatableObject>().splatmap;
+        splatmap = hit.transform.GetComponent<SplatableObject>().Splatmap;
 
         if (!splatmap) return false;
 
