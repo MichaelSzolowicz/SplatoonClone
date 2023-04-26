@@ -18,7 +18,7 @@ public class SplatableObject : MonoBehaviour
         //splatmap.GenerateMips();
 
         thisMaterial = GetComponent<Renderer>().material;
-        thisMaterial.SetTexture("splatmap", splatmap);
+        thisMaterial.SetTexture("_Splatmap", splatmap);
     }
 
     public void DrawSplat(Vector2 uvPos, float radius, float hardness, float strength, Color inkColor)
