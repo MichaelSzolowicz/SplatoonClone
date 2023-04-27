@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 public class SplatableObject : MonoBehaviour
 {
     private RenderTexture splatmap;
+    public RenderTexture tempM;
 
     // Used to blit newly drawn ink on top of the existing inking. The mobile/particle/additive material works well for this.
     [SerializeField]
@@ -19,21 +20,25 @@ public class SplatableObject : MonoBehaviour
     private Material splatMaterial;
     private Material thisMaterial;
 
+    CommandBuffer cmd;
+
     void Start()
     {
         splatmap = new RenderTexture(1024, 1024, 0);
-        splatMaterial = new Material(Shader.Find("Unlit/SplatMask"));
-        //splatmap.useMipMap = true;
-        //splatmap.GenerateMips();
+        //splatmap.filterMode = FilterMode.Trilinear;
+        tempM = new RenderTexture(1024, 1024, 0);
+        //tempM.filterMode = FilterMode.Trilinear;
 
+
+        splatMaterial = new Material(Shader.Find("Unlit/SplatMask"));       
         thisMaterial = GetComponent<Renderer>().material;
-
-        RenderTexture temp = RenderTexture.GetTemporary(1024, 1024);
-        Graphics.CopyTexture(temp, splatmap);
-        RenderTexture.ReleaseTemporary(temp);
         thisMaterial.SetTexture("_Splatmap", splatmap);
 
+         cmd = new CommandBuffer();
+
         
+
+
     }
 
     public void DrawSplat(Vector3 uvPos, float radius, float hardness, float strength, Color inkColor)
@@ -44,16 +49,16 @@ public class SplatableObject : MonoBehaviour
         splatMaterial.SetVector(Shader.PropertyToID("_SplatPos"), uvPos);
         splatMaterial.SetVector(Shader.PropertyToID("_InkColor"), inkColor);
 
-        CommandBuffer cmd = new CommandBuffer();
+        
 
-        RenderTexture temp = RenderTexture.GetTemporary(splatmap.width, splatmap.height, 0);
-        cmd.SetRenderTarget(temp);
+        cmd.SetRenderTarget(tempM);
         cmd.DrawRenderer(GetComponent<Renderer>(), splatMaterial, 0);
 
-        cmd.Blit(temp, splatmap, alphaCombiner);
+        cmd.SetRenderTarget(splatmap);
+        cmd.Blit(tempM, splatmap, alphaCombiner);
         
         Graphics.ExecuteCommandBuffer(cmd);
-        RenderTexture.ReleaseTemporary(temp);
+        cmd.Clear();
 
     }
 }

@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Unlit/SplatMask"
 {
     Properties
@@ -11,6 +13,8 @@ Shader "Unlit/SplatMask"
 
         Pass
         {
+            Conservative True
+
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -42,6 +46,8 @@ Shader "Unlit/SplatMask"
                 float4 vertex : SV_POSITION;
                 float4 worldPos : TEXCOORD0;
                 float2 uv : TEXCOORD1;
+                //float weight : TEXCOORD2;
+                
             };
 
             v2f vert(appdata v)
@@ -49,7 +55,7 @@ Shader "Unlit/SplatMask"
                 v2f o;
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 o.uv = v.uv;
-                float4 uv = (0, 0, 0, 1);
+                float4 uv = float4(0, 0, 0, 1);
                 uv.xy = (v.uv.xy * 2 - 1) * float2(1, _ProjectionParams.x);
                 o.vertex = uv;
                 return o;
@@ -60,12 +66,17 @@ Shader "Unlit/SplatMask"
                 return 1 - smoothstep(radius * hardness, radius, m);
             }
 
-            float4 frag(v2f i) : COLOR
+            float4 frag(v2f i) : SV_Target
             {
+                //float w = distance(_SplatPos, i.vertex);
+                //return float4(0, 0, 0, i.weight);
+
+                
                 float4 col = tex2D(_MainTex, i.uv);
                 float m = mask(i.worldPos, _SplatPos, _Radius, _Hardness);
                 float edge = m * _Strength;
                 return lerp(col, _InkColor, edge);
+                
             }
             ENDCG
         }
