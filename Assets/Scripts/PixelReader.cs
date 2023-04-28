@@ -38,7 +38,7 @@ public class PixelReader : MonoBehaviour
 
             if (isValidHit)
             {
-                var rt = RenderTexture.GetTemporary(1, 1, 0, RenderTextureFormat.ARGB32);
+                var rt = RenderTexture.GetTemporary(1, 1, 0, RenderTextureFormat.ARGBFloat);
 
                 Graphics.CopyTexture(splatmap, 0, 0, (int)textureCoords.x, (int)textureCoords.y, 1, 1, rt, 0, 0, 0, 0);
 

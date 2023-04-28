@@ -24,9 +24,9 @@ public class SplatableObject : MonoBehaviour
 
     void Start()
     {
-        splatmap = new RenderTexture(1024, 1024, 0);
+        splatmap = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGBFloat);
         //splatmap.filterMode = FilterMode.Trilinear;
-        tempM = new RenderTexture(1024, 1024, 0);
+        tempM = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGBFloat);
         //tempM.filterMode = FilterMode.Trilinear;
 
 
