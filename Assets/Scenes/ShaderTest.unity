@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.17398126, g: 0.2175488, b: 0.29972196, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -156,7 +156,7 @@ MeshCollider:
   serializedVersion: 4
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -5479418014115891881, guid: 0aa7302f2c690164f8cccb43fe303557, type: 3}
+  m_Mesh: {fileID: 4068373912626513877, guid: 1fa3858ad96fc914096f9d5ba751b370, type: 3}
 --- !u!23 &157378822
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -205,7 +205,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 157378820}
-  m_Mesh: {fileID: -5479418014115891881, guid: 0aa7302f2c690164f8cccb43fe303557, type: 3}
+  m_Mesh: {fileID: 4068373912626513877, guid: 1fa3858ad96fc914096f9d5ba751b370, type: 3}
 --- !u!4 &157378824
 Transform:
   m_ObjectHideFlags: 0
@@ -213,13 +213,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 157378820}
-  m_LocalRotation: {x: -0, y: 0.94157577, z: -0, w: 0.33680144}
-  m_LocalPosition: {x: -0.57182, y: -4.28, z: -0.96062}
-  m_LocalScale: {x: 0.33832267, y: 0.33832267, z: 0.33832267}
+  m_LocalRotation: {x: 0.27856863, y: 0.20185356, z: 0.13874412, w: 0.92865753}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 4.2873363, y: 4.2873363, z: 4.2873363}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 140.636, z: 0}
+  m_LocalEulerAnglesHint: {x: 27.476, y: 30.644, z: 24.659}
 --- !u!114 &157378825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -715,10 +715,10 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1730702092}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 0.5687026, y: 0.23394561, z: -0.31132546, w: 0.7245159}
+  m_LocalPosition: {x: 1.53, y: 1.39, z: -2.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 75.868, y: -3.548, z: -49.272}

@@ -22,7 +22,7 @@ public class PixelReader : MonoBehaviour
 
     protected void Start()
     {
-        Application.targetFrameRate = -1;
+        Application.targetFrameRate = 60;
 
         StartCoroutine(ReadPixelContinous());
     }
