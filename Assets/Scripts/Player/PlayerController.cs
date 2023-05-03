@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 /// [Player Controller]
 /// [05-01-23]
 /// [Szolowicz, Michael]
-/// Defines actions a default player characteris capable of. 
+/// Defines actions a default player character is capable of. 
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     protected const float STOP_MIN_THRESHOLD = .2f;
 
     public Rigidbody rigibody;
+    public ThirPersonCamera thirdPersonCamera;
 
     protected PlayerControls playerControls;
 
@@ -47,9 +48,14 @@ public class PlayerController : MonoBehaviour
         playerControls.Enable();
     }
 
+    protected void Update()
+    {
+        Vector2 mouseDelta = playerControls.Walking.Camera.ReadValue<Vector2>();
+        thirdPersonCamera.CameraUpdate(mouseDelta.x, mouseDelta.y);
+    }
+
     protected void FixedUpdate()
     {
-
         UpdatePhysics();
     }
 
@@ -153,7 +159,7 @@ public class PlayerController : MonoBehaviour
     /// Strong enough braking also keeps us from maintaining inputVelocity while running into walls.
     /// </summary>
     /// <param name="collision"></param>
-    public void AddFriction()
+    protected void AddFriction()
     {
         pendingForce += braking * -inputVelocity.normalized;
     }
