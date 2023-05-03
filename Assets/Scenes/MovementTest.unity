@@ -494,13 +494,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 783668605}
-  m_LocalRotation: {x: -0.00021201262, y: -0.06084594, z: 0.8476375, w: 0.52707547}
-  m_LocalPosition: {x: -10.01, y: 0.58, z: 0.0000000049066884}
+  m_LocalRotation: {x: -0, y: -0, z: -0.6954519, w: 0.71857274}
+  m_LocalPosition: {x: -10.01, y: 0.58, z: 0.0000000039854773}
   m_LocalScale: {x: 11.788592, y: 0.56090176, z: 7.5913}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 5.908, y: -3.718, z: 116.06}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -88.126}
 --- !u!1 &804675421
 GameObject:
   m_ObjectHideFlags: 0
@@ -900,7 +900,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1072975429}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2, y: 5.23, z: -1.445}
+  m_LocalPosition: {x: -9.35, y: 6.91, z: -1.445}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 804675424}
@@ -921,12 +921,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigibody: {fileID: 1072975435}
   grounded: 0
+  minSlopeGradation: 0.5
+  slopeCheckTolerance: 0.01
   gravityScale: 1
-  maxAcceleration: 100
-  maxSpeed: 5
-  inputStrength: 100
-  braking: 0
-  frictionCoefficient: 20
+  maxAcceleration: 999
+  maxHorizontalSpeed: 5
+  inputStrength: 999
+  braking: 20
 --- !u!54 &1072975435
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1031,13 +1032,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1423290475}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.36, y: -0.29, z: 0.000000012876165}
+  m_LocalRotation: {x: -0.018085083, y: -0, z: -0, w: 0.9998365}
+  m_LocalPosition: {x: -1.36, y: -0.29, z: 0.000000008459696}
   m_LocalScale: {x: 286.80048, y: 1.583033, z: 7.5913}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -2.073, y: 0, z: 0}
 --- !u!1 &1766680644
 GameObject:
   m_ObjectHideFlags: 0
@@ -1073,12 +1074,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigibody: {fileID: 1766680646}
   grounded: 0
+  minSlopeGradation: 0
+  slopeCheckTolerance: 0.01
   gravityScale: 1
   maxAcceleration: 999
-  maxSpeed: 5
+  maxHorizontalSpeed: 5
   inputStrength: 0
   braking: 0
-  frictionCoefficient: 1
 --- !u!54 &1766680646
 Rigidbody:
   m_ObjectHideFlags: 0

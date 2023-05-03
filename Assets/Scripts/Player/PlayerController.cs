@@ -11,37 +11,35 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class PlayerController : MonoBehaviour
 {
-    public Rigidbody rigibody;
-
     protected const float GRAVITY_CONSTANT = 9.8f;
+    protected const float STOP_MIN_THRESHOLD = .2f;
+
+    public Rigidbody rigibody;
 
     protected PlayerControls playerControls;
 
     protected Vector3 pendingInput;
     protected Vector3 pendingForce;
-    protected Vector3 velocity;
+    protected Vector3 inputVelocity;
+    protected Vector3 gravityVelocity;
     protected Vector3 groundNormal;
 
-    protected Vector3 gravVel;
-
-    [SerializeField]
+    [SerializeField, Tooltip("True if the character is colliding.")]
     protected bool grounded;
-
+    [SerializeField]
+    protected float minSlopeGradation = .0f;
+    [SerializeField]
+    protected float slopeCheckTolerance = .01f;
     [SerializeField]
     protected float gravityScale = 1.0f;
     [SerializeField]
     protected float maxAcceleration = 1.0f;
     [SerializeField]
-    protected float maxSpeed = 5.0f;
-    /// <summary>
-    /// Magnitude of force to apply on input.
-    /// </summary>
-    [SerializeField]
+    protected float maxHorizontalSpeed = 5.0f;
+    [SerializeField, Tooltip("Magnitude of force to apply on input.")]
     protected float inputStrength = 1.0f;
-    [SerializeField]
+    [SerializeField, Tooltip("Constant force applied opposing input velocity.")]
     protected float braking = 0.0f;
-    [SerializeField]
-    protected float frictionCoefficient = 100.0f;
 
     protected void Awake()
     {
@@ -58,15 +56,6 @@ public class PlayerController : MonoBehaviour
     private Vector2 GetInput() 
     {
         pendingInput = new Vector3(playerControls.Walking.MovementInput.ReadValue<Vector2>().x, 0, playerControls.Walking.MovementInput.ReadValue<Vector2>().y) * inputStrength;
-
-        // is actually ground collision. Need better checking system later
-        /*
-        if(Vector3.Dot(groundNormal, Vector3.up) > 0f)
-        {
-            pendingInput = Vector3.ProjectOnPlane(pendingInput, groundNormal);
-        } */
-        
-
         return pendingInput;
     }
 
@@ -83,27 +72,22 @@ public class PlayerController : MonoBehaviour
     protected void UpdatePhysics() 
     {
         AddInput(GetInput(), inputStrength);
-        Collision delteMe = new Collision();
-        AddFriction(delteMe);
+        AddFriction();
 
-        //print("Vel: "+velocity);
-        //print("Inp: " + pendingInput);
-
-        //AddGravity();
-
-        // Ignoring mass.
+        // Calc acceleration, Ignoring mass.
         Vector3 a = pendingForce;
         if (a.magnitude >= maxAcceleration) a = a.normalized * maxAcceleration;
 
-        velocity += a * Time.fixedDeltaTime;
-        if (velocity.magnitude >= maxSpeed) velocity = velocity.normalized * maxSpeed;
+        // Lock max & min speed.
+        inputVelocity += a * Time.fixedDeltaTime;
+        if (inputVelocity.magnitude >= maxHorizontalSpeed) inputVelocity = inputVelocity.normalized * maxHorizontalSpeed;
+        if (inputVelocity.magnitude <= STOP_MIN_THRESHOLD) inputVelocity = Vector3.zero;
 
-        Vector3 delta = velocity * Time.fixedDeltaTime;
+        Vector3 delta = inputVelocity * Time.fixedDeltaTime;
 
-        /* FIXME: Anyhwere I cehck the normal / up dot, I should use a threshold instead of a finite check. */
-        if (Vector3.Dot(groundNormal, Vector3.up) > .0f && grounded)
+        // Maintain velocity parallel to floor
+        if (Vector3.Dot(groundNormal, Vector3.up) - slopeCheckTolerance > minSlopeGradation && grounded)
         {
-            // Maintain velocity parallel to floor
             float magnitude = delta.magnitude;
             delta = Vector3.ProjectOnPlane(delta, groundNormal);
             delta = delta.normalized * magnitude;
@@ -112,19 +96,12 @@ public class PlayerController : MonoBehaviour
         // Keep gravity calculation seperate. If they get normalized when the character goes overspeed, horizontally moving charcters will fall more slowly.
         if (!grounded)
         {
-            print("apply grav");
-            gravVel += Vector3.down * GRAVITY_CONSTANT * gravityScale * Time.fixedDeltaTime;
-            if (gravVel.magnitude >= maxSpeed) gravVel = gravVel.normalized * maxSpeed;
-            delta += gravVel * Time.fixedDeltaTime;
-        } 
-
-       // print(gravVel);
+            gravityVelocity += Vector3.down * GRAVITY_CONSTANT * gravityScale * Time.fixedDeltaTime;
+            delta += gravityVelocity * Time.fixedDeltaTime;
+        }
 
         transform.position += delta;
-
-
         pendingForce = Vector3.zero;
-
     }
 
     protected void OnCollisionExit(Collision collision)
@@ -135,43 +112,35 @@ public class PlayerController : MonoBehaviour
 
     protected void OnCollisionEnter(Collision collision)
     {
-        /* FIXME: Anyhwere I cehck the normal / up dot, I should use a threshold instead of a finite check. */
-        if (Vector3.Dot(collision.GetContact(0).normal, Vector3.up) > .0f)
-        {
-            grounded = true;
-            print(Vector3.Dot(collision.GetContact(0).normal, Vector3.up));
-            gravVel.y = 0f;
-        }
-            
-        
-        groundNormal = collision.GetContact(0).normal;
         HandleCollision(collision);
     }
 
     protected void OnCollisionStay(Collision collision)
     {
-        /* FIXME: Anyhwere I cehck the normal / up dot, I should use a threshold instead of a finite check. */
-        if (Vector3.Dot(collision.GetContact(0).normal, Vector3.up) > .0f)
-        {
-            grounded = true;
-            //print(Vector3.Dot(collision.GetContact(0).normal, Vector3.up));
-        }
-
         HandleCollision(collision);
     }
 
     protected void HandleCollision(Collision collision)
     {
+        // Check if the slope is walkable
+        if (Vector3.Dot(collision.GetContact(0).normal, Vector3.up) - slopeCheckTolerance > minSlopeGradation)
+        {
+            grounded = true;
+            gravityVelocity.y = 0f;
+        }
+
         groundNormal = collision.GetContact(0).normal;
 
+        // Correct our position wo the capsule doesn't clip inside other geometry.
         Vector3 correction;
         float distance;
         Physics.ComputePenetration(GetComponent<CapsuleCollider>(), transform.position, transform.rotation, collision.collider, collision.transform.position, collision.transform.rotation, out correction, out distance);
 
-        // print(correction + " : " + distance);
-        if (distance > 0) { }
+        if (distance > 0)
+        {
+            // Only apply the correction if it is valid.
             transform.Translate(correction * distance);
-
+        }
     }
 
     public void AddForce(Vector3 force) 
@@ -179,29 +148,13 @@ public class PlayerController : MonoBehaviour
         pendingForce += force;
     }
 
-    public void AddFriction(Collision collision)
+    /// <summary>
+    /// Going to keep this as a simple braking factor.
+    /// Strong enough braking also keeps us from maintaining inputVelocity while running into walls.
+    /// </summary>
+    /// <param name="collision"></param>
+    public void AddFriction()
     {
-        pendingForce += frictionCoefficient * -velocity;
-
-        //braking
-        if(playerControls.Walking.MovementInput.ReadValue<Vector2>().magnitude == 0.0f)
-        {
-            //pendingForce += braking * -velocity.normalized;
-            //velocity *= braking;
-        }
-        
-        
-        //if (pendingForce.magnitude <= .02f) pendingForce = Vector3.zero;
+        pendingForce += braking * -inputVelocity.normalized;
     }
-
-    public void AddGravity() 
-    {
-
-        pendingForce += Vector3.down * GRAVITY_CONSTANT * gravityScale;
-    }
-
-    public void AddGroundFriction()
-    {
-
-    }
-}
+}   
