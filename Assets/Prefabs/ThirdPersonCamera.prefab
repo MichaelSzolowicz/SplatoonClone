@@ -44,9 +44,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15b08305174444f4d8a6d6ee8f80d616, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 1426702611845850317}
-  target: {fileID: 1426702611128489020}
-  distance: 2
+  camera: {fileID: 1426702611845850312}
+  followTransform: {fileID: 1426702611128489020}
+  followDistance: 6
+  Y_MAX: 1
+  Y_MIN: 0.5
+  xSensitivity: 0.5
+  ySensitivity: 0.2
+  yRotation: 0
 --- !u!1 &1426702611845850313
 GameObject:
   m_ObjectHideFlags: 0

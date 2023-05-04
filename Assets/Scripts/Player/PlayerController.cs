@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     protected const float STOP_MIN_THRESHOLD = .2f;
 
     public Rigidbody rigibody;
+    public GameObject mesh;
     public ThirPersonCamera thirdPersonCamera;
 
     protected PlayerControls playerControls;
@@ -44,6 +45,7 @@ public class PlayerController : MonoBehaviour
 
     protected void Awake()
     {
+        Cursor.visible = false;
         playerControls = new PlayerControls();
         playerControls.Enable();
     }
@@ -52,6 +54,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector2 mouseDelta = playerControls.Walking.Camera.ReadValue<Vector2>();
         thirdPersonCamera.CameraUpdate(mouseDelta.x, mouseDelta.y);
+        mesh.transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, thirdPersonCamera.yRotation, transform.rotation.eulerAngles.z);
     }
 
     protected void FixedUpdate()
@@ -61,7 +64,14 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 GetInput() 
     {
-        pendingInput = new Vector3(playerControls.Walking.MovementInput.ReadValue<Vector2>().x, 0, playerControls.Walking.MovementInput.ReadValue<Vector2>().y) * inputStrength;
+        pendingInput = new Vector3(playerControls.Walking.MovementInput.ReadValue<Vector2>().x, 0, playerControls.Walking.MovementInput.ReadValue<Vector2>().y);
+        Vector3 worldSpaceInput = Quaternion.LookRotation(-transform.up, mesh.transform.forward) * Quaternion.Euler(-90f, 0, 0) * pendingInput;
+        pendingInput = worldSpaceInput;
+
+        pendingInput *= inputStrength;
+
+        Debug.DrawLine(transform.position, transform.position + pendingInput * 5, Color.red, 1.0f);
+
         return pendingInput;
     }
 
@@ -105,6 +115,8 @@ public class PlayerController : MonoBehaviour
             gravityVelocity += Vector3.down * GRAVITY_CONSTANT * gravityScale * Time.fixedDeltaTime;
             delta += gravityVelocity * Time.fixedDeltaTime;
         }
+
+
 
         transform.position += delta;
         pendingForce = Vector3.zero;

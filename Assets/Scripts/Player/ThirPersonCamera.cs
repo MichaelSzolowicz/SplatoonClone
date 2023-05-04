@@ -4,33 +4,40 @@ using UnityEngine;
 
 public class ThirPersonCamera : MonoBehaviour
 {
-    public Camera cam;
-    public Transform target;
-    public float distance = 6.0f;
-
-    protected Transform useTransform;
-
+    public Transform camera;
+    public Transform followTransform;
+    [SerializeField]
+    protected float followDistance = 6.0f;
     protected float _offsetX, _offsetY;
+    [SerializeField]
+    protected float Y_MAX = 1.0f;
+    [SerializeField]
+    protected float Y_MIN = .50f;
+    [SerializeField]
+    protected float xSensitivity = 1.0f, ySensitivity = 1.0f;
+
+    public float yRotation;
 
     protected void Awake()
     {
-        cam.transform.position = target.position + (target.forward * -distance);
+        camera.transform.position = followTransform.position + (followTransform.forward * -followDistance);
 
-        Debug.DrawLine(cam.transform.position, target.position, Color.red, 100.0f);
-    }
-
-    protected void Start()
-    {
-
+        Debug.DrawLine(camera.transform.position, followTransform.position, Color.red, 100.0f);
     }
 
     public void CameraUpdate(float offsetX, float offsetY)
     {
-        _offsetX += offsetX;
-        _offsetY += offsetY;
-        Vector3 direction = new Vector3(0, 0, -distance);
+        _offsetX += offsetX * xSensitivity;
+        _offsetY += offsetY * ySensitivity;
+
+        _offsetY = Mathf.Clamp(_offsetY, Y_MIN, Y_MAX);
+
+        Vector3 direction = new Vector3(0, 0, -followDistance);
         Quaternion rot = Quaternion.Euler(_offsetY, _offsetX, 0);
-        cam.transform.position = (target.position + rot * direction);
-        cam.transform.LookAt(target.position);
+        camera.transform.position = (followTransform.position + rot * direction);
+        camera.transform.LookAt(followTransform.position);
+
+
+        yRotation = camera.transform.rotation.eulerAngles.y;
     }
 }
