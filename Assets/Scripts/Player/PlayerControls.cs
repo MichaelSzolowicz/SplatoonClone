@@ -44,6 +44,15 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Squid"",
+                    ""type"": ""Button"",
+                    ""id"": ""30b99f12-ff44-4430-aabf-338cbae64fce"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -112,6 +121,17 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""action"": ""Camera"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fcc4eb24-49f3-4781-9d06-faca2fffa8ca"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Squid"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -122,6 +142,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         m_Walking = asset.FindActionMap("Walking", throwIfNotFound: true);
         m_Walking_MovementInput = m_Walking.FindAction("MovementInput", throwIfNotFound: true);
         m_Walking_Camera = m_Walking.FindAction("Camera", throwIfNotFound: true);
+        m_Walking_Squid = m_Walking.FindAction("Squid", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -183,12 +204,14 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     private IWalkingActions m_WalkingActionsCallbackInterface;
     private readonly InputAction m_Walking_MovementInput;
     private readonly InputAction m_Walking_Camera;
+    private readonly InputAction m_Walking_Squid;
     public struct WalkingActions
     {
         private @PlayerControls m_Wrapper;
         public WalkingActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @MovementInput => m_Wrapper.m_Walking_MovementInput;
         public InputAction @Camera => m_Wrapper.m_Walking_Camera;
+        public InputAction @Squid => m_Wrapper.m_Walking_Squid;
         public InputActionMap Get() { return m_Wrapper.m_Walking; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -204,6 +227,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @Camera.started -= m_Wrapper.m_WalkingActionsCallbackInterface.OnCamera;
                 @Camera.performed -= m_Wrapper.m_WalkingActionsCallbackInterface.OnCamera;
                 @Camera.canceled -= m_Wrapper.m_WalkingActionsCallbackInterface.OnCamera;
+                @Squid.started -= m_Wrapper.m_WalkingActionsCallbackInterface.OnSquid;
+                @Squid.performed -= m_Wrapper.m_WalkingActionsCallbackInterface.OnSquid;
+                @Squid.canceled -= m_Wrapper.m_WalkingActionsCallbackInterface.OnSquid;
             }
             m_Wrapper.m_WalkingActionsCallbackInterface = instance;
             if (instance != null)
@@ -214,6 +240,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @Camera.started += instance.OnCamera;
                 @Camera.performed += instance.OnCamera;
                 @Camera.canceled += instance.OnCamera;
+                @Squid.started += instance.OnSquid;
+                @Squid.performed += instance.OnSquid;
+                @Squid.canceled += instance.OnSquid;
             }
         }
     }
@@ -222,5 +251,6 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     {
         void OnMovementInput(InputAction.CallbackContext context);
         void OnCamera(InputAction.CallbackContext context);
+        void OnSquid(InputAction.CallbackContext context);
     }
 }

@@ -9,6 +9,16 @@ using UnityEngine.InputSystem;
 /// [Szolowicz, Michael]
 /// Defines actions a default player character is capable of. 
 /// </summary>
+/// 
+
+
+public enum MovementMode
+{
+    Walking,
+    SwimmingWall
+}
+
+
 public class PlayerController : MonoBehaviour
 {
     protected const float GRAVITY_CONSTANT = 9.8f;
@@ -19,6 +29,10 @@ public class PlayerController : MonoBehaviour
     public ThirPersonCamera thirdPersonCamera;
 
     protected PlayerControls playerControls;
+
+    public MovementMode moveMode;       /** FIXME public for testing purpoises only **/
+    public bool isSquid;
+    public CapsuleCollider capsule;
 
     protected Vector3 pendingInput;
     protected Vector3 pendingForce;
@@ -34,6 +48,7 @@ public class PlayerController : MonoBehaviour
     protected float slopeCheckTolerance = .01f;
     [SerializeField]
     protected float gravityScale = 1.0f;
+    protected float defaultGravityScale;
     [SerializeField]
     protected float maxAcceleration = 1.0f;
     [SerializeField]
@@ -45,9 +60,15 @@ public class PlayerController : MonoBehaviour
 
     protected void Awake()
     {
-        Cursor.visible = false;
+        //Cursor.visible = false;
         playerControls = new PlayerControls();
         playerControls.Enable();
+        playerControls.Walking.Squid.performed += EnterSquid;
+        playerControls.Walking.Squid.canceled += ExitSquid;
+
+        moveMode = MovementMode.Walking;
+        isSquid = false;
+        defaultGravityScale = gravityScale;
     }
 
     protected void Update()
@@ -65,12 +86,33 @@ public class PlayerController : MonoBehaviour
     private Vector2 GetInput() 
     {
         pendingInput = new Vector3(playerControls.Walking.MovementInput.ReadValue<Vector2>().x, 0, playerControls.Walking.MovementInput.ReadValue<Vector2>().y);
-        Vector3 worldSpaceInput = Quaternion.LookRotation(-transform.up, mesh.transform.forward) * Quaternion.Euler(-90f, 0, 0) * pendingInput;
-        pendingInput = worldSpaceInput;
 
-        pendingInput *= inputStrength;
+        RaycastHit hit;
+        Vector3 sratPos = new Vector3(capsule.transform.position.x, capsule.transform.position.y - .5f, capsule.transform.position.z);
+        Ray ray = new Ray(sratPos, mesh.transform.forward);
+        bool isValidHit = Physics.Raycast(ray, out hit, capsule.radius + .1f);
 
-        Debug.DrawLine(transform.position, transform.position + pendingInput * 5, Color.red, 1.0f);
+        /**TESTONLY*/
+        Debug.DrawLine(sratPos, sratPos + mesh.transform.forward * (capsule.radius + .1f), Color.blue, 1.0f);
+        print(isValidHit);
+
+        /** TESTONLY testing wall swimming **/
+        if (isSquid && isValidHit)
+        {
+            moveMode = MovementMode.SwimmingWall;
+            gravityScale = 0f;
+            gravityVelocity = Vector3.zero;
+            grounded = false;
+            pendingInput = Quaternion.LookRotation(-hit.normal, transform.up) * Quaternion.Euler(-90f, 0, 0) * pendingInput;
+        }
+        else
+        {
+            pendingInput = Quaternion.LookRotation(-transform.up, mesh.transform.forward) * Quaternion.Euler(-90f, 0, 0) * pendingInput;
+            moveMode = MovementMode.Walking;
+            gravityScale = defaultGravityScale;
+        }
+
+        Debug.DrawLine(transform.position, transform.position + pendingInput * 5, Color.red, .1f);
 
         return pendingInput;
     }
@@ -82,7 +124,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="strength"> Multiplier for input vector. IE magnitude of force. </param>
     private void AddInput(Vector2 inputVector, float strength) 
     {
-        pendingForce += pendingInput;
+        pendingForce += pendingInput * inputStrength;
     }
 
     protected void UpdatePhysics() 
@@ -174,5 +216,19 @@ public class PlayerController : MonoBehaviour
     protected void AddFriction()
     {
         pendingForce += braking * -inputVelocity.normalized;
+    }
+
+    protected void EnterSquid(InputAction.CallbackContext context)
+    {
+        print("Enter Squid");
+
+        isSquid = true;
+    }
+
+    protected void ExitSquid(InputAction.CallbackContext context)
+    {
+        print("Exit Squid");
+
+        isSquid = false;
     }
 }   
