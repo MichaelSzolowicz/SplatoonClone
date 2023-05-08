@@ -80,9 +80,10 @@ MonoBehaviour:
   rigibody: {fileID: 4800295623315155304}
   mesh: {fileID: 4800295624498294034}
   thirdPersonCamera: {fileID: 1678682495089541263}
-  moveMode: 0
+  currentMovementState: 0
   isSquid: 0
   capsule: {fileID: 4800295623315155301}
+  team: {x: 0, y: 0, z: 0, w: 0}
   grounded: 0
   minSlopeGradation: 0.5
   slopeCheckTolerance: 0.01
@@ -328,6 +329,14 @@ PrefabInstance:
     - target: {fileID: 6185117644521438449, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
       propertyPath: Y_MIN
       value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6185117644521438449, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: xSensitivity
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6185117644521438449, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: ySensitivity
+      value: 0.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 75c3b337ccf048f4abde367525febe15, type: 3}

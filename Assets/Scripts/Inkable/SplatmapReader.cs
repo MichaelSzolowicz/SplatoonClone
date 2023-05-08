@@ -8,6 +8,9 @@ public class SplatmapReader : MonoBehaviour
     private RenderTexture splatmap;
     private Color color;
 
+    public delegate void CallbackDelgate(Color color);
+    CallbackDelgate callbackDelgate;
+
     // Start
     private WaitForSeconds waitForSeconds = new WaitForSeconds(0.032f);
     private WaitForEndOfFrame waitForEndOfFrame = new WaitForEndOfFrame();
@@ -20,9 +23,11 @@ public class SplatmapReader : MonoBehaviour
     private Ray mouseRay;
     private RaycastHit hit;
 
-    public Color ReadPixel(RenderTexture target, Vector2 uv)
+    public Color ReadPixel(RenderTexture target, Vector2 uv, CallbackDelgate callbackFunction)
     {
         //isValidHit = GetSplatmapCoords(ref inCoordinates);
+
+        callbackDelgate = callbackFunction;
 
         //if (isValidHit)
         {
@@ -83,9 +88,10 @@ public class SplatmapReader : MonoBehaviour
 
         Color c = tex.GetPixel(0, 0);
         color = c;
+        callbackDelgate.Invoke(c);
 
         //print("Splatmap: " + color);
 
-        Destroy(tex);
+        DestroyImmediate(tex);
     }
 }
