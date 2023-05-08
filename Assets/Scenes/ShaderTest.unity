@@ -232,6 +232,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 821155215f1345c43b5df67f0d6583fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sourceMap: {fileID: 0}
+  textureSize: 1024
   tempM: {fileID: 0}
   alphaCombiner: {fileID: 2100000, guid: dd1ae8b5e1dd4cc4588875f1e5df6239, type: 2}
 --- !u!1 &225347648

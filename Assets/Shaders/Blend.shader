@@ -9,6 +9,7 @@ Shader "Unlit/Blend"
        // Tags { "RenderType"="Transparent" }
        Blend One OneMinusSrcAlpha
 
+
         Pass
         {
             CGPROGRAM

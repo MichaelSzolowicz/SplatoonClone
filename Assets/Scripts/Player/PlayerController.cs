@@ -81,6 +81,7 @@ public class PlayerController : MonoBehaviour
     protected void FixedUpdate()
     {
         UpdatePhysics();
+        print(moveMode + " Speed: " + inputVelocity.magnitude);
     }
 
     private Vector2 GetInput() 

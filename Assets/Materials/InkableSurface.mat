@@ -20,19 +20,19 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - Texture2D_d5eef962d1c14d359542b6658910d8c2:
-        m_Texture: {fileID: 2800000, guid: 6dcd1bb06e4605b4d93ef7f41fc9e18a, type: 3}
+        m_Texture: {fileID: 2800000, guid: fbd2c0caba460ea488c6679b8d2e6c94, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_d5eef962d1c14d359542b6658910d8c2_1:
-        m_Texture: {fileID: 2800000, guid: 6c38a65c2bb9ce849a176f862c3c85a8, type: 3}
+        m_Texture: {fileID: 2800000, guid: 12060e93480d589449e6a442a70691c6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_d5eef962d1c14d359542b6658910d8c2_2:
-        m_Texture: {fileID: 2800000, guid: 6c38a65c2bb9ce849a176f862c3c85a8, type: 3}
+        m_Texture: {fileID: 2800000, guid: 12060e93480d589449e6a442a70691c6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_d5eef962d1c14d359542b6658910d8c2_3:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 12060e93480d589449e6a442a70691c6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_e8340a2afea5458f9edc914beb601c62:
@@ -48,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Splatmap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 71905fc01b5248f4a979ae1a32d6cded, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - splatmap:
@@ -68,8 +68,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_49b3e0933f4249f5bdd71d60202d8328: -12.18
-    - Vector1_975cead425bc45d9b600a0b1d68a77b8: 0.2
+    - Vector1_49b3e0933f4249f5bdd71d60202d8328: 1
+    - Vector1_975cead425bc45d9b600a0b1d68a77b8: 2.3
     m_Colors:
     - Color_243c94d567a6495a86b9b3c52087cf64: {r: 0.21007515, g: 0.16487186, b: 0.8962264, a: 0}
     - Color_28cde616faab479d80713dc8ad4c24c9: {r: 0.23641238, g: 0.8396226, b: 0.17822176, a: 0}

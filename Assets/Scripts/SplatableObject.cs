@@ -5,6 +5,10 @@ using UnityEngine.Rendering;
 
 public class SplatableObject : MonoBehaviour
 {
+    [SerializeField]
+    protected Texture sourceMap;
+    [SerializeField]
+    protected int textureSize = 1024;
     private RenderTexture splatmap;
     public RenderTexture tempM;
 
@@ -24,9 +28,19 @@ public class SplatableObject : MonoBehaviour
 
     void Start()
     {
-        splatmap = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGBFloat);
-        //splatmap.filterMode = FilterMode.Trilinear;
-        tempM = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGBFloat);
+        if(sourceMap)
+        {
+            print(sourceMap.graphicsFormat);
+            splatmap = new RenderTexture(sourceMap.width, sourceMap.height, 0, RenderTextureFormat.ARGBFloat);
+            splatmap.enableRandomWrite = true;
+            //RenderTexture.active = splatmap;
+            Graphics.Blit(sourceMap, splatmap, alphaCombiner);
+        }
+        else
+        {
+            splatmap = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBFloat);
+        }
+        tempM = new RenderTexture(splatmap.width, splatmap.height, 0, RenderTextureFormat.ARGBFloat);
         //tempM.filterMode = FilterMode.Trilinear;
 
 
