@@ -12,7 +12,7 @@ using UnityEngine.InputSystem;
 /// 
 
 
-public enum MovementMode
+public enum MovementState
 {
     Walking,
     SwimmingWall
@@ -29,8 +29,9 @@ public class PlayerController : MonoBehaviour
     public ThirPersonCamera thirdPersonCamera;
 
     protected PlayerControls playerControls;
+    protected SplatmapReader splatmapReader;
 
-    public MovementMode moveMode;       /** FIXME public for testing purpoises only **/
+    public MovementState currentMovementState;       /** FIXME public for testing purpoises only **/
     public bool isSquid;
     public CapsuleCollider capsule;
 
@@ -66,13 +67,16 @@ public class PlayerController : MonoBehaviour
         playerControls.Walking.Squid.performed += EnterSquid;
         playerControls.Walking.Squid.canceled += ExitSquid;
 
-        moveMode = MovementMode.Walking;
+        currentMovementState = MovementState.Walking;
         isSquid = false;
         defaultGravityScale = gravityScale;
+
+        splatmapReader = new SplatmapReader();
     }
 
     protected void Update()
     {
+        // Camera rotation
         Vector2 mouseDelta = playerControls.Walking.Camera.ReadValue<Vector2>();
         thirdPersonCamera.CameraUpdate(mouseDelta.x, mouseDelta.y);
         mesh.transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, thirdPersonCamera.yRotation, transform.rotation.eulerAngles.z);
@@ -80,8 +84,27 @@ public class PlayerController : MonoBehaviour
 
     protected void FixedUpdate()
     {
+        UpdateMovementState();
         UpdatePhysics();
-        print(moveMode + " Speed: " + inputVelocity.magnitude);
+    }
+
+    protected void UpdateMovementState()
+    {
+        Color color
+        RaycastHit hit;
+        Ray ray = new Ray(transform.position, Vector3.down);
+        bool isValidHit = Physics.Raycast(ray, out hit, (capsule.height + .1f) / 2);
+
+        /** TESTONLY **/    Debug.DrawLine(transform.position, transform.position - Vector3.up * (capsule.height + .1f) / 2, Color.red, .1f);
+
+        SplatableObject splatObj = hit.collider.GetComponent<SplatableObject>();
+        if (isValidHit && splatObj)
+        {      
+            color = splatmapReader.ReadPixel(splatObj.Splatmap, hit.textureCoord);
+
+            /** TESTONLY **/    print(color);
+        }
+        
     }
 
     private Vector2 GetInput() 
@@ -93,11 +116,11 @@ public class PlayerController : MonoBehaviour
         Ray ray = new Ray(sratPos, mesh.transform.forward);
         bool isValidHit = Physics.Raycast(ray, out hit, capsule.radius + .1f);
 
-        /**TESTONLY*/
+        /**TESTONLY
         Debug.DrawLine(sratPos, sratPos + mesh.transform.forward * (capsule.radius + .1f), Color.blue, 1.0f);
         print(isValidHit);
 
-        /** TESTONLY testing wall swimming **/
+
         if (isSquid && isValidHit)
         {
             moveMode = MovementMode.SwimmingWall;
@@ -113,7 +136,8 @@ public class PlayerController : MonoBehaviour
             gravityScale = defaultGravityScale;
         }
 
-        Debug.DrawLine(transform.position, transform.position + pendingInput * 5, Color.red, .1f);
+        Debug.DrawLine(transform.position, transform.position + pendingInput * 5, Color.red, .1f); 
+        **/
 
         return pendingInput;
     }

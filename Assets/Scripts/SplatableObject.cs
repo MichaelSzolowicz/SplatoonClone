@@ -32,7 +32,7 @@ public class SplatableObject : MonoBehaviour
         {
             print(sourceMap.graphicsFormat);
             splatmap = new RenderTexture(sourceMap.width, sourceMap.height, 0, RenderTextureFormat.ARGBFloat);
-            splatmap.enableRandomWrite = true;
+            //splatmap.enableRandomWrite = true;
             //RenderTexture.active = splatmap;
             Graphics.Blit(sourceMap, splatmap, alphaCombiner);
         }

@@ -3,12 +3,13 @@ using UnityEngine.Rendering;
 using System.IO;
 using System.Collections;
 
-public class PixelReader : MonoBehaviour
+public class SplatmapReader : MonoBehaviour
 {
     private RenderTexture splatmap;
+    private Color color;
 
     // Start
-    private WaitForSeconds waitForSeconds = new WaitForSeconds(0.0f);
+    private WaitForSeconds waitForSeconds = new WaitForSeconds(0.032f);
     private WaitForEndOfFrame waitForEndOfFrame = new WaitForEndOfFrame();
 
     private Vector2 textureCoords;
@@ -19,34 +20,24 @@ public class PixelReader : MonoBehaviour
     private Ray mouseRay;
     private RaycastHit hit;
 
-    protected void Start()
+    public Color ReadPixel(RenderTexture target, Vector2 uv)
     {
-        Application.targetFrameRate = 60;
+        //isValidHit = GetSplatmapCoords(ref inCoordinates);
 
-        StartCoroutine(ReadPixelContinous());
-    }
-
-    protected IEnumerator ReadPixelContinous()
-    {
-        while (true)
+        //if (isValidHit)
         {
-            yield return waitForSeconds;
-            yield return waitForEndOfFrame;
+            var rt = RenderTexture.GetTemporary(1, 1, 0, RenderTextureFormat.ARGBFloat);
 
-            isValidHit = GetSplatmapCoords(ref textureCoords);
+            Graphics.CopyTexture(target, 0, 0, (int)(uv.x * target.width), (int)(uv.y * target.height), 1, 1, rt, 0, 0, 0, 0);
 
-            if (isValidHit)
-            {
-                var rt = RenderTexture.GetTemporary(1, 1, 0, RenderTextureFormat.ARGBFloat);
+            //print("SplatmapReader: " + (int)(uv.x * target.width) + ", " + (int)(uv.y * target.height));
 
-                Graphics.CopyTexture(splatmap, 0, 0, (int)textureCoords.x, (int)textureCoords.y, 1, 1, rt, 0, 0, 0, 0);
-                //print("PixelReader: " + (int)textureCoords.x + ", " + (int)textureCoords.y);
+            AsyncGPUReadback.Request(rt, 0, TextureFormat.ARGB32, OnCompleteReadback);
 
-                AsyncGPUReadback.Request(rt, 0, TextureFormat.ARGB32, OnCompleteReadback);
-
-                RenderTexture.ReleaseTemporary(rt);
-            }
+            RenderTexture.ReleaseTemporary(rt);
         }
+
+        return color;
     }
 
     /// <summary>
@@ -54,7 +45,7 @@ public class PixelReader : MonoBehaviour
     /// </summary>
     /// <param name="textureCoords">Store the ouput coordinates.</param>
     /// <returns>Returns true if the mouse hit an object.</returns>
-    bool GetSplatmapCoords(ref Vector2 textureCoords)
+    bool MouseToUv(ref Vector2 textureCoords)
     {
         mouseScreenPos = Input.mousePosition;
         mouseRay = Camera.main.ScreenPointToRay(mouseScreenPos);
@@ -90,8 +81,10 @@ public class PixelReader : MonoBehaviour
         tex.LoadRawTextureData(request.GetData<uint>());
         tex.Apply();
 
-        Color color = tex.GetPixel(0, 0);
-        //print("Reader: " + color);
+        Color c = tex.GetPixel(0, 0);
+        color = c;
+
+        //print("Splatmap: " + color);
 
         Destroy(tex);
     }
