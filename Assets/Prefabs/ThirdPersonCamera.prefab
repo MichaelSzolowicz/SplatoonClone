@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1426702611128489020}
-  - component: {fileID: 6185117644521438449}
+  - component: {fileID: 4259088803797291680}
   m_Layer: 0
   m_Name: ThirdPersonCamera
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6185117644521438449
+--- !u!114 &4259088803797291680
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1426702611128489021}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15b08305174444f4d8a6d6ee8f80d616, type: 3}
+  m_Script: {fileID: 11500000, guid: 76b9d126ede5c5f4cb8ab1e7a4e3c33e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 1426702611845850312}
@@ -49,9 +49,9 @@ MonoBehaviour:
   followDistance: 6
   Y_MAX: 1
   Y_MIN: 0.5
-  xSensitivity: 0
-  ySensitivity: 0
-  yRotation: 0
+  xSensitivity: 1
+  ySensitivity: 1
+  yRotation: 1.25
 --- !u!1 &1426702611845850313
 GameObject:
   m_ObjectHideFlags: 0

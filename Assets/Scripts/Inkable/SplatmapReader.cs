@@ -5,73 +5,33 @@ using System.Collections;
 
 public class SplatmapReader : MonoBehaviour
 {
-    private RenderTexture splatmap;
+    /// <summary> Most recently read color. </summary>
     private Color color;
-
-    public delegate void CallbackDelgate(Color color);
-    CallbackDelgate callbackDelgate;
-
-    // Start
-    private WaitForSeconds waitForSeconds = new WaitForSeconds(0.032f);
-    private WaitForEndOfFrame waitForEndOfFrame = new WaitForEndOfFrame();
-
-    private Vector2 textureCoords;
-    bool isValidHit;
-
-    // Get splatmap coords
-    private Vector3 mouseScreenPos;
-    private Ray mouseRay;
-    private RaycastHit hit;
-
-    public Color ReadPixel(RenderTexture target, Vector2 uv, CallbackDelgate callbackFunction)
+    /// <summary> Most recently read color. </summary>
+    public Color Color
     {
-        //isValidHit = GetSplatmapCoords(ref inCoordinates);
-
-        callbackDelgate = callbackFunction;
-
-        //if (isValidHit)
-        {
-            var rt = RenderTexture.GetTemporary(1, 1, 0, RenderTextureFormat.ARGBFloat);
-
-            Graphics.CopyTexture(target, 0, 0, (int)(uv.x * target.width), (int)(uv.y * target.height), 1, 1, rt, 0, 0, 0, 0);
-
-            //print("SplatmapReader: " + (int)(uv.x * target.width) + ", " + (int)(uv.y * target.height));
-
-            AsyncGPUReadback.Request(rt, 0, TextureFormat.ARGB32, OnCompleteReadback);
-
-            RenderTexture.ReleaseTemporary(rt);
-        }
-
-        return color;
+        get { return color; }
     }
 
+    public delegate void CallbackDelgate(Color color);
+    [Tooltip("Callback delegate is used to give information back to the original caller.")]
+    private CallbackDelgate callbackDelgate;
+
     /// <summary>
-    /// Projects mouse position to splatmap uv space.
+    /// Read the color of a pixel at uv coordinate on rendertexture using Async GPU Readback.
     /// </summary>
-    /// <param name="textureCoords">Store the ouput coordinates.</param>
-    /// <returns>Returns true if the mouse hit an object.</returns>
-    bool MouseToUv(ref Vector2 textureCoords)
+    /// <param name="target"></param>
+    /// <param name="uv"></param>
+    /// <param name="callbackFunction">Function returning void taking a Color parameter. Used to get information back to the original caller.</param>
+    public void ReadPixel(RenderTexture target, Vector2 uv, CallbackDelgate callbackFunction = null)
     {
-        mouseScreenPos = Input.mousePosition;
-        mouseRay = Camera.main.ScreenPointToRay(mouseScreenPos);
+        callbackDelgate = callbackFunction;
 
-        bool bHit = Physics.Raycast(mouseRay, out hit, Mathf.Infinity);
+         var rt = RenderTexture.GetTemporary(1, 1, 0, RenderTextureFormat.ARGBFloat);
 
-
-        if (!bHit) return false;
-
-        if (!hit.transform.GetComponent<SplatableObject>()) return false;
-
-
-        splatmap = hit.transform.GetComponent<SplatableObject>().Splatmap;
-
-        if (!splatmap) return false;
-
-        textureCoords = hit.textureCoord;
-        textureCoords.x *= splatmap.width;
-        textureCoords.y *= splatmap.height;
-
-        return true;
+         Graphics.CopyTexture(target, 0, 0, (int)(uv.x * target.width), (int)(uv.y * target.height), 1, 1, rt, 0, 0, 0, 0);
+         AsyncGPUReadback.Request(rt, 0, TextureFormat.ARGB32, OnCompleteReadback);
+         RenderTexture.ReleaseTemporary(rt);
     }
 
     void OnCompleteReadback(AsyncGPUReadbackRequest request)
@@ -86,11 +46,8 @@ public class SplatmapReader : MonoBehaviour
         tex.LoadRawTextureData(request.GetData<uint>());
         tex.Apply();
 
-        Color c = tex.GetPixel(0, 0);
-        color = c;
-        callbackDelgate.Invoke(c);
-
-        //print("Splatmap: " + color);
+        color = tex.GetPixel(0, 0);
+        callbackDelgate.Invoke(color);
 
         DestroyImmediate(tex);
     }

@@ -77,13 +77,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c96867022bd017d4c8fac5479c109b76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigibody: {fileID: 4800295623315155304}
   mesh: {fileID: 4800295624498294034}
-  thirdPersonCamera: {fileID: 1678682495089541263}
-  currentMovementState: 0
-  isSquid: 0
+  cameraControls: {fileID: 8756477465735966430}
   capsule: {fileID: 4800295623315155301}
   team: {x: 0, y: 0, z: 0, w: 0}
+  currentMovementState: 0
+  isSquid: 0
   grounded: 0
   minSlopeGradation: 0.5
   slopeCheckTolerance: 0.01
@@ -323,6 +322,34 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: yMax
+      value: 86
+      objectReference: {fileID: 0}
+    - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: yMin
+      value: -6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: Y_MAX
+      value: 86
+      objectReference: {fileID: 0}
+    - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: Y_MIN
+      value: -6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: yRotation
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: xSensitivity
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: ySensitivity
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 6185117644521438449, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
       propertyPath: Y_MAX
       value: 80
@@ -346,15 +373,15 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1426702611128489020, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
   m_PrefabInstance: {fileID: 4800295624275262590}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1678682495089541263 stripped
+--- !u!114 &8756477465735966430 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6185117644521438449, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
   m_PrefabInstance: {fileID: 4800295624275262590}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15b08305174444f4d8a6d6ee8f80d616, type: 3}
+  m_Script: {fileID: 11500000, guid: 76b9d126ede5c5f4cb8ab1e7a4e3c33e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5859949580157212855 stripped
