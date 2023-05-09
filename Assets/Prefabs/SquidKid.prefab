@@ -46,9 +46,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
-  m_Height: 2
+  m_Height: 0.03
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: -0.5, z: 0}
 --- !u!54 &4800295623315155304
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -92,6 +92,7 @@ MonoBehaviour:
   maxHorizontalSpeed: 5
   inputStrength: 999
   braking: 20
+  updateMovementStateDelay: 0.032
 --- !u!1 &4800295623397941644
 GameObject:
   m_ObjectHideFlags: 0

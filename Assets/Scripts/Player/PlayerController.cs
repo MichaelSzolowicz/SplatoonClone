@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
     public MovementState currentMovementState;       /** FIXME public for testing purpoises only **/
     protected delegate void UpdateMovementStateDelgate();
     UpdateMovementStateDelgate updateMovementStateDelgate;
+    protected Vector3 hitNormal;
     public bool isSquid;
     public CapsuleCollider capsule;
     public Vector4 team;
@@ -84,6 +85,8 @@ public class PlayerController : MonoBehaviour
 
         baseMaxHorizontalSpeed = maxHorizontalSpeed;
 
+        hitNormal = Vector3.up;
+
         Invoke("UpdateMovementState", .032f);
     }
 
@@ -103,13 +106,39 @@ public class PlayerController : MonoBehaviour
 
     protected void UpdateMovementState()
     {
-        // Downward probe.
+        SplatableObject splatObj;
+
+        // Forward probe
         RaycastHit hit;
-        Ray ray = new Ray(transform.position, Vector3.down);
-        bool isValidHit = Physics.Raycast(ray, out hit, (capsule.height + .1f) / 2);
+        Ray ray = new Ray(capsule.transform.TransformPoint(capsule.center), mesh.transform.forward);
+        bool isValidHit = Physics.Raycast(ray, out hit, capsule.radius + .01f);
+
+        Debug.DrawRay(ray.origin, ray.direction, Color.blue, .1f);
+
+        if(isValidHit && currentMovementState != MovementState.EnemyInk)
+        {
+            print(hit.collider.gameObject.name);
+
+            hitNormal = hit.normal;
+            splatObj = hit.collider.GetComponent<SplatableObject>();
+            if(splatObj)
+            {
+                splatmapReader.ReadPixel(splatObj.Splatmap, hit.textureCoord, FinishUpdateMovementSate);
+                return;
+            }
+        }
+
+        hitNormal = Vector3.up;
+
+        // Downward probe.
+        hit = new RaycastHit();
+        ray = new Ray(capsule.transform.TransformPoint(capsule.center), Vector3.down);
+        isValidHit = Physics.Raycast(ray, out hit, (capsule.height / 2 + capsule.radius) + .1f);
+
+        //print(isValidHit);
 
         /** TESTONLY **/
-        Debug.DrawLine(transform.position, transform.position - Vector3.up * (capsule.height + .1f) / 2, Color.red, .1f);
+        Debug.DrawRay(ray.origin, ray.direction * ((capsule.height / 2 + capsule.radius) + .1f), Color.red, .1f);
 
         if (!isValidHit)
         {
@@ -117,92 +146,93 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        SplatableObject splatObj = hit.collider.GetComponent<SplatableObject>();
+        hitNormal = hit.normal;
+        splatObj = hit.collider.GetComponent<SplatableObject>();
 
         if (splatObj)
         {
             splatmapReader.ReadPixel(splatObj.Splatmap, hit.textureCoord, FinishUpdateMovementSate);
         }
         else FinishUpdateMovementSate(Color.clear);
-
-        /**
-        Color color = new Color();
-        RaycastHit hit;
-        SplatableObject splatObj;
-
-        // Horizontal probe.
-        Ray ray = new Ray(transform.position, mesh.transform.forward);
-        bool isValidHit = Physics.Raycast(ray, out hit, capsule.radius + .1f);
-
-        /** TESTONLY 
-        Debug.DrawRay(ray.origin, ray.direction, Color.blue, .1f);
-
-        if(isValidHit && isSquid)
-        {
-            
-            splatObj = hit.collider.GetComponent<SplatableObject>();
-
-            if (splatObj)
-            {
-                
-                color = splatmapReader.ReadPixel(splatObj.Splatmap, hit.textureCoord, FinishUpdateMovementSate);
-                print(color);
-
-                if (color.r > .5f)
-                {
-                    
-                    print("SwimmingWall");
-                }
-            }
-        }
-        */
     }
 
     protected void FinishUpdateMovementSate(Color color)
     {
-        // Enemy ink
-        if (color.g > .5f && currentMovementState != MovementState.EnemyInk)
+        //print(Vector3.Dot(hitNormal, Vector3.up));
+
+        if(Vector3.Dot(hitNormal, Vector3.up) - slopeCheckTolerance < minSlopeGradation)
         {
+
+            if (color.r > .5f && color.a > .5f && isSquid)
+            {
+                print("SwimmingWall");
+                currentMovementState = MovementState.SwimmingWall;
+                maxHorizontalSpeed = baseMaxHorizontalSpeed * 2f;
+                Invoke("UpdateMovementState", updateMovementStateDelay);
+                return;
+            }
+            else
+            {
+                currentMovementState = MovementState.Walking;
+            }
+        }
+
+        // Enemy ink
+        if (color.g > .5f)
+        {
+            if (currentMovementState == MovementState.EnemyInk)
+            {
+                Invoke("UpdateMovementState", updateMovementStateDelay);
+                return;
+            }
             print("EnemyInk");
             currentMovementState = MovementState.EnemyInk;
             maxHorizontalSpeed = baseMaxHorizontalSpeed * .5f;
             isSquid = false;
+            Invoke("UpdateMovementState", updateMovementStateDelay);
+            return;
 
         }
+
         // Swimming
-        else if (color.r > .5f && isSquid && currentMovementState != MovementState.Swimming)
+        if (color.r > .5f && isSquid)
         {
+            if(currentMovementState == MovementState.Swimming)
+            {
+                Invoke("UpdateMovementState", updateMovementStateDelay);
+                return;
+            }
             print("Swimming");
             currentMovementState = MovementState.Swimming;
             maxHorizontalSpeed = baseMaxHorizontalSpeed * 2f;
             if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
-        }
-        // Default case
-        else if (color.g < .5f && color.r < .5 && currentMovementState != MovementState.Walking)
-        {
-            print("Walking");
-            currentMovementState = MovementState.Walking;
-            maxHorizontalSpeed = baseMaxHorizontalSpeed;
-            if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
+            Invoke("UpdateMovementState", updateMovementStateDelay);
+            return;
         }
 
-        print("Finished Update Movement State at "+ Time.time);
+        // Default case
+        print("Walking");
+        currentMovementState = MovementState.Walking;
+        maxHorizontalSpeed = baseMaxHorizontalSpeed;
+        if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
+
+        //print("Finished Update Movement State at "+ Time.time);
 
         Invoke("UpdateMovementState", updateMovementStateDelay);
+        return;
     }
 
     private Vector2 GetInput() 
     {
         pendingInput = new Vector3(playerControls.Walking.MovementInput.ReadValue<Vector2>().x, 0, playerControls.Walking.MovementInput.ReadValue<Vector2>().y);
 
-
-        if (false && isSquid && currentMovementState == MovementState.SwimmingWall)
+        //print(currentMovementState);
+        if (isSquid && currentMovementState == MovementState.SwimmingWall)
         {
-            //moveMode = MovementMode.SwimmingWall;
-            //gravityScale = 0f;
-            //gravityVelocity = Vector3.zero;
-            //grounded = false;
-            //pendingInput = Quaternion.LookRotation(-hit.normal, transform.up) * Quaternion.Euler(-90f, 0, 0) * pendingInput;
+            gravityScale = 0f;
+            gravityVelocity = Vector3.zero;
+            grounded = false;
+            pendingInput = Quaternion.LookRotation(-hitNormal, transform.up) * Quaternion.Euler(-90f, 0, 0) * pendingInput;
         }
         else
         {
