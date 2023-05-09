@@ -53,6 +53,15 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Shoot"",
+                    ""type"": ""Button"",
+                    ""id"": ""574c9b49-09b4-47cb-97fa-a48109215ec4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -132,6 +141,17 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""action"": ""Squid"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b386637b-b11e-4670-8f5c-8a877382edca"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -143,6 +163,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         m_Walking_MovementInput = m_Walking.FindAction("MovementInput", throwIfNotFound: true);
         m_Walking_Camera = m_Walking.FindAction("Camera", throwIfNotFound: true);
         m_Walking_Squid = m_Walking.FindAction("Squid", throwIfNotFound: true);
+        m_Walking_Shoot = m_Walking.FindAction("Shoot", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -205,6 +226,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Walking_MovementInput;
     private readonly InputAction m_Walking_Camera;
     private readonly InputAction m_Walking_Squid;
+    private readonly InputAction m_Walking_Shoot;
     public struct WalkingActions
     {
         private @PlayerControls m_Wrapper;
@@ -212,6 +234,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         public InputAction @MovementInput => m_Wrapper.m_Walking_MovementInput;
         public InputAction @Camera => m_Wrapper.m_Walking_Camera;
         public InputAction @Squid => m_Wrapper.m_Walking_Squid;
+        public InputAction @Shoot => m_Wrapper.m_Walking_Shoot;
         public InputActionMap Get() { return m_Wrapper.m_Walking; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -230,6 +253,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @Squid.started -= m_Wrapper.m_WalkingActionsCallbackInterface.OnSquid;
                 @Squid.performed -= m_Wrapper.m_WalkingActionsCallbackInterface.OnSquid;
                 @Squid.canceled -= m_Wrapper.m_WalkingActionsCallbackInterface.OnSquid;
+                @Shoot.started -= m_Wrapper.m_WalkingActionsCallbackInterface.OnShoot;
+                @Shoot.performed -= m_Wrapper.m_WalkingActionsCallbackInterface.OnShoot;
+                @Shoot.canceled -= m_Wrapper.m_WalkingActionsCallbackInterface.OnShoot;
             }
             m_Wrapper.m_WalkingActionsCallbackInterface = instance;
             if (instance != null)
@@ -243,6 +269,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @Squid.started += instance.OnSquid;
                 @Squid.performed += instance.OnSquid;
                 @Squid.canceled += instance.OnSquid;
+                @Shoot.started += instance.OnShoot;
+                @Shoot.performed += instance.OnShoot;
+                @Shoot.canceled += instance.OnShoot;
             }
         }
     }
@@ -252,5 +281,6 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         void OnMovementInput(InputAction.CallbackContext context);
         void OnCamera(InputAction.CallbackContext context);
         void OnSquid(InputAction.CallbackContext context);
+        void OnShoot(InputAction.CallbackContext context);
     }
 }

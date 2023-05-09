@@ -5,16 +5,16 @@ using UnityEngine.Rendering;
 
 public class SplatableObject : MonoBehaviour
 {
-    [SerializeField]
+    private RenderTexture splatmap;
+    private RenderTexture tempM;
+
+    [SerializeField, Tooltip("Used to blit newly drawn ink on top of the existing inking.")]
+    protected Material alphaCombiner;
+
+    [SerializeField, Tooltip("If left blank a blank render texture of size textureSize will be automatically generated.")]
     protected Texture sourceMap;
     [SerializeField]
     protected int textureSize = 1024;
-    private RenderTexture splatmap;
-    public RenderTexture tempM;
-
-    // Used to blit newly drawn ink on top of the existing inking. The mobile/particle/additive material works well for this.
-    [SerializeField]
-    protected Material alphaCombiner;
 
     public RenderTexture Splatmap
     {
@@ -23,8 +23,7 @@ public class SplatableObject : MonoBehaviour
 
     private Material splatMaterial;
     private Material thisMaterial;
-
-    CommandBuffer cmd;
+    private CommandBuffer cmd;
 
     void Start()
     {
@@ -32,8 +31,6 @@ public class SplatableObject : MonoBehaviour
         {
             print(sourceMap.graphicsFormat);
             splatmap = new RenderTexture(sourceMap.width, sourceMap.height, 0, RenderTextureFormat.ARGBFloat);
-            //splatmap.enableRandomWrite = true;
-            //RenderTexture.active = splatmap;
             Graphics.Blit(sourceMap, splatmap, alphaCombiner);
         }
         else
@@ -41,29 +38,21 @@ public class SplatableObject : MonoBehaviour
             splatmap = new RenderTexture(textureSize, textureSize, 0, RenderTextureFormat.ARGBFloat);
         }
         tempM = new RenderTexture(splatmap.width, splatmap.height, 0, RenderTextureFormat.ARGBFloat);
-        //tempM.filterMode = FilterMode.Trilinear;
-
 
         splatMaterial = new Material(Shader.Find("Unlit/SplatMask"));       
         thisMaterial = GetComponent<Renderer>().material;
         thisMaterial.SetTexture("_Splatmap", splatmap);
 
          cmd = new CommandBuffer();
-
-        
-
-
     }
 
-    public void DrawSplat(Vector3 uvPos, float radius, float hardness, float strength, Color inkColor)
+    public void DrawSplat(Vector3 worldPos, float radius, float hardness, float strength, Color inkColor)
     {
         splatMaterial.SetFloat(Shader.PropertyToID("_Radius"), radius);
         splatMaterial.SetFloat(Shader.PropertyToID("_Hardness"), hardness);
         splatMaterial.SetFloat(Shader.PropertyToID("_Strength"), strength);
-        splatMaterial.SetVector(Shader.PropertyToID("_SplatPos"), uvPos);
+        splatMaterial.SetVector(Shader.PropertyToID("_SplatPos"), worldPos);
         splatMaterial.SetVector(Shader.PropertyToID("_InkColor"), inkColor);
-
-        
 
         cmd.SetRenderTarget(tempM);
         cmd.DrawRenderer(GetComponent<Renderer>(), splatMaterial, 0);
@@ -73,6 +62,5 @@ public class SplatableObject : MonoBehaviour
         
         Graphics.ExecuteCommandBuffer(cmd);
         cmd.Clear();
-
     }
 }

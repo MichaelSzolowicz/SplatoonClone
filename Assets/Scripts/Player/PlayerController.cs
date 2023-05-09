@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     public GameObject mesh;
     public ThirdPersonCamera cameraControls;
     public CapsuleCollider capsule;
+    public Shooter shooter;
 
     /** Internal objects **/
     protected PlayerControls playerControls;
@@ -84,6 +85,8 @@ public class PlayerController : MonoBehaviour
         playerControls.Enable();
         playerControls.Walking.Squid.performed += EnterSquid;
         playerControls.Walking.Squid.canceled += ExitSquid;
+        playerControls.Walking.Shoot.performed += OnPressedShoot;
+        playerControls.Walking.Shoot.canceled += OnReleaseShoot;
 
         //Default values
         defaultGravityScale = gravityScale;
@@ -104,6 +107,7 @@ public class PlayerController : MonoBehaviour
         Vector2 mouseDelta = playerControls.Walking.Camera.ReadValue<Vector2>();
         cameraControls.CameraUpdate(mouseDelta.x, mouseDelta.y);
         mesh.transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, cameraControls.yRotation, transform.rotation.eulerAngles.z);
+        shooter.transform.rotation = Quaternion.LookRotation(cameraControls.cameraTransform.forward);
     }
 
     protected void FixedUpdate()
@@ -229,7 +233,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Default case
-        print("Walking");
+        //print("Walking");
         currentMovementState = MovementState.Walking;
         maxHorizontalSpeed = baseMaxHorizontalSpeed;
         if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
@@ -384,5 +388,17 @@ public class PlayerController : MonoBehaviour
         print("Walking");
         currentMovementState = MovementState.Walking;
         maxHorizontalSpeed = baseMaxHorizontalSpeed;
+    }
+
+    protected void OnPressedShoot(InputAction.CallbackContext context)
+    {
+        print("start shooting");
+        shooter.StartShooting();
+    }
+
+    protected void OnReleaseShoot(InputAction.CallbackContext context)
+    {
+        print("stop shooting");
+        shooter.StopShooting();
     }
 }   
