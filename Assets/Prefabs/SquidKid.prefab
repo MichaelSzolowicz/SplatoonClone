@@ -92,7 +92,9 @@ MonoBehaviour:
   maxHorizontalSpeed: 5
   inputStrength: 999
   braking: 20
+  inkAlphaMinThreshold: 0.1
   updateMovementStateDelay: 0.032
+  enemyInkSlowingFactor: 0.2
 --- !u!1 &4800295623397941644
 GameObject:
   m_ObjectHideFlags: 0

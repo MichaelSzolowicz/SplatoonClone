@@ -76,7 +76,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Tooltip("Constant force applied opposing input velocity.")]
     protected float braking = 0.0f;
     [SerializeField]
+    protected float inkAlphaMinThreshold;
+    [SerializeField]
     protected float updateMovementStateDelay = 0.032f;
+    [SerializeField]
+    protected float enemyInkSlowingFactor;
 
     protected void Awake()
     {
@@ -186,7 +190,7 @@ public class PlayerController : MonoBehaviour
         if(surfaceProbeHit.collider && Vector3.Dot(surfaceProbeHit.normal, Vector3.up) - slopeCheckTolerance < minSlopeGradation)
         {
 
-            if (color.r > .5f && color.a > .5f && isSquid)
+            if (color.a > inkAlphaMinThreshold && color.r > color.g && color.a > .5f && isSquid)
             {
                 print("WallSwimming");
                 currentMovementState = MovementState.WallSwimming;
@@ -201,7 +205,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Enemy ink
-        if (color.g > .5f)
+        if (color.a > inkAlphaMinThreshold && color.g > color.r)
         {
             if (currentMovementState == MovementState.EnemyInk)
             {
@@ -210,14 +214,14 @@ public class PlayerController : MonoBehaviour
             }
             print("EnemyInk");
             currentMovementState = MovementState.EnemyInk;
-            maxHorizontalSpeed = baseMaxHorizontalSpeed * .5f;
+            maxHorizontalSpeed = baseMaxHorizontalSpeed * enemyInkSlowingFactor;
             isSquid = false;
             Invoke("UpdateMovementState", updateMovementStateDelay);
             return;
         }
 
         // Swimming
-        if (color.r > .5f && isSquid)
+        if (color.a > inkAlphaMinThreshold && color.r > color.g && isSquid)
         {
             if(currentMovementState == MovementState.Swimming)
             {

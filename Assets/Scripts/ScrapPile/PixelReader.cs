@@ -91,7 +91,7 @@ public class PixelReader : MonoBehaviour
         tex.Apply();
 
         Color color = tex.GetPixel(0, 0);
-        //print("Reader: " + color);
+        print("Reader: " + color);
 
         Destroy(tex);
     }

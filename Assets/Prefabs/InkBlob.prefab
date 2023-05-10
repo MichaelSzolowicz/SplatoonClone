@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d196c9a5e3ceaf340be2c790a463c8eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: {x: 1, y: 0, z: 0}
+  team: {x: 0, y: 1, z: 0}
   radius: 1
   hardness: 0
   strength: 0.1
