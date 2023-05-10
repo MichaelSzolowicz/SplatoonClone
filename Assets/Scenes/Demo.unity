@@ -283,7 +283,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4800295623315155305, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
       propertyPath: testGravMult
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4800295623315155306, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
       propertyPath: m_RootOrder
@@ -352,6 +352,14 @@ PrefabInstance:
     - target: {fileID: 9207059423363516063, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
       propertyPath: strength
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9207059423363516063, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
+      propertyPath: inkColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9207059423363516063, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
+      propertyPath: inkColor.r
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}

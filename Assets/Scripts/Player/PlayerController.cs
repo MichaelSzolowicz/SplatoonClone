@@ -205,7 +205,7 @@ public class PlayerController : MonoBehaviour
             {
                 //print("WallSwimming");
                 currentMovementState = MovementState.WallSwimming;
-                maxHorizontalSpeed = baseMaxHorizontalSpeed * 1f;
+                maxHorizontalSpeed = baseMaxHorizontalSpeed * 2f;
                 Invoke("UpdateMovementState", updateMovementStateDelay);
                 return;
             }
@@ -241,7 +241,7 @@ public class PlayerController : MonoBehaviour
             }
             print("Swimming");
             currentMovementState = MovementState.Swimming;
-            maxHorizontalSpeed = baseMaxHorizontalSpeed * 1f;
+            maxHorizontalSpeed = baseMaxHorizontalSpeed * 2f;
             if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
             Invoke("UpdateMovementState", updateMovementStateDelay);
             return;
@@ -250,8 +250,10 @@ public class PlayerController : MonoBehaviour
         // Default case
         //print("Walking");
         currentMovementState = MovementState.Walking;
-        maxHorizontalSpeed = baseMaxHorizontalSpeed;
+        if(grounded) maxHorizontalSpeed = baseMaxHorizontalSpeed;
         if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
+ 
+        
 
         //print("Finished Update Movement State at "+ Time.time);
 
@@ -269,7 +271,7 @@ public class PlayerController : MonoBehaviour
         
         //print(inputVelocity.y + verticalVelocity.y);
 
-        if (isSquid && Vector3.Dot(surfaceProbeHit.normal, Vector3.up) - slopeCheckTolerance < minSlopeGradation && surfaceProbeHit.collider)
+        if (isSquid && currentMovementState == MovementState.WallSwimming  /*Vector3.Dot(surfaceProbeHit.normal, Vector3.up) - slopeCheckTolerance < minSlopeGradation && surfaceProbeHit.collider*/)
         {
             print("Wall Swimmming");
             gravityScale = defaultGravityScale * testGravMult;
@@ -277,22 +279,28 @@ public class PlayerController : MonoBehaviour
 
             braking = 20;
 
-            verticalVelocity = Vector3.zero;
+            //verticalVelocity = Vector3.zero;
             grounded = false;
             pendingInput = Quaternion.LookRotation(-surfaceProbeHit.normal, transform.up) * Quaternion.Euler(-90f, 0, 0) * pendingInput;
         }
         else if(isSquid && !surfaceProbeHit.collider && inputVelocity.y + verticalVelocity.y < 0f)
         {
             print("peak");
+            maxHorizontalSpeed = baseMaxHorizontalSpeed;
+            pendingInput = Quaternion.LookRotation(mesh.transform.forward, Vector3.up) * pendingInput;
         }
-        else if(isSquid && !surfaceProbeHit.collider)
+        else if(isSquid && !surfaceProbeHit.collider && !grounded)
         {
             pendingInput = Vector3.zero;
+            braking = 0;
             gravityScale = defaultGravityScale;
         }
         else
         {
+            print("else");
             braking = 20;
+            gravityScale = defaultGravityScale;
+            //maxHorizontalSpeed = baseMaxHorizontalSpeed;
             pendingInput = Quaternion.LookRotation(mesh.transform.forward, Vector3.up) * pendingInput;
         }
 
