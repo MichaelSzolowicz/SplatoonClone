@@ -17,11 +17,8 @@ public class MousePainter : MonoBehaviour
 
     protected void Draw()
     {
-        //print("Mouse is drawing");
-
         Vector3 mousePos = Input.mousePosition;
         Ray ray = Camera.main.ScreenPointToRay(mousePos);
-
         RaycastHit hit;
         bool isValidHit = Physics.Raycast(ray, out hit, Mathf.Infinity);
 
@@ -30,10 +27,9 @@ public class MousePainter : MonoBehaviour
         SplatableObject splatObject = hit.transform.GetComponent<SplatableObject>();
         if (!splatObject) return;
 
-        print(hit.point);
+        //print(hit.point);
 
         splatObject.DrawSplat(hit.point, radius, hardness, strength, inkColor);
 
-        
     }
 }

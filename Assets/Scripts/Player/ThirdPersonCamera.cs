@@ -35,8 +35,6 @@ public class ThirdPersonCamera : MonoBehaviour
     protected void Awake()
     {
         cameraTransform.position = followTransform.position + (followTransform.forward * -followDistance);
-
-        //Debug.DrawLine(cameraTransform.position, followTransform.position, Color.red, 100.0f);
     }
 
     public void CameraUpdate(float offsetX, float offsetY)
@@ -50,7 +48,6 @@ public class ThirdPersonCamera : MonoBehaviour
         Quaternion rot = Quaternion.Euler(_offsetY, _offsetX, 0);
         cameraTransform.position = (followTransform.position + rot * direction);
         cameraTransform.LookAt(followTransform.position);
-
 
         _yRotation = cameraTransform.rotation.eulerAngles.y;
     }

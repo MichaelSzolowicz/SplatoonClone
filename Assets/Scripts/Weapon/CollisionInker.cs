@@ -15,7 +15,6 @@ public class CollisionInker : MonoBehaviour
     private void Awake()
     {
         color = new Color(team.x, team.y, team.z, 1.0f);
-        //radius = GetComponent<SphereCollider>().radius;
     }
 
     private void OnCollisionStay(Collision collision)

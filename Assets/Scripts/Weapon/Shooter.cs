@@ -14,12 +14,6 @@ public class Shooter : MonoBehaviour
     [SerializeField]
     protected float xVariance, yVariance;
 
-    private void Start()
-    {
-        /**TESTONLY**/
-        //StartShooting();
-    }
-
     public void StartShooting()
     {
         StartCoroutine(ShootOnLoop());
