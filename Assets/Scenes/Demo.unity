@@ -282,8 +282,12 @@ PrefabInstance:
       value: SquidKid
       objectReference: {fileID: 0}
     - target: {fileID: 4800295623315155305, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
+      propertyPath: gravityScale
+      value: 1.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 4800295623315155305, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
       propertyPath: testGravMult
-      value: 0
+      value: 27
       objectReference: {fileID: 0}
     - target: {fileID: 4800295623315155306, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
       propertyPath: m_RootOrder
@@ -295,7 +299,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4800295623315155306, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.517
+      value: 1.31
       objectReference: {fileID: 0}
     - target: {fileID: 4800295623315155306, guid: 36b061297bfd31544b51ff736d3f819f, type: 3}
       propertyPath: m_LocalPosition.z

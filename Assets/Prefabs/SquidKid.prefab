@@ -96,6 +96,8 @@ MonoBehaviour:
   inkAlphaMinThreshold: 0.1
   updateMovementStateDelay: 0.032
   enemyInkSlowingFactor: 0.2
+  testGravMult: 1
+  testBrakeMult: 6.14
 --- !u!1 &4800295623397941644
 GameObject:
   m_ObjectHideFlags: 0

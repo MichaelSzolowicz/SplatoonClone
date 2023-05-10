@@ -6,7 +6,7 @@ public class ColliderPainter : MonoBehaviour
 {
     private void OnCollisionStay(Collision collision)
     {
-        print("collision");
+        //print("collision");
 
         if (!collision.transform.GetComponent<SplatableObject>()) return;
 
