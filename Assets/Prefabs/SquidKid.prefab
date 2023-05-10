@@ -81,6 +81,7 @@ MonoBehaviour:
   cameraControls: {fileID: 8756477465735966430}
   capsule: {fileID: 4800295623315155301}
   shooter: {fileID: 3925857457533538663}
+  animator: {fileID: 5363453453808921309}
   team: {x: 0, y: 0, z: 0, w: 0}
   currentMovementState: 0
   isSquid: 0
@@ -187,6 +188,7 @@ GameObject:
   - component: {fileID: 4800295624498294038}
   - component: {fileID: 4800295624498294039}
   - component: {fileID: 4800295624498294032}
+  - component: {fileID: 5363453453808921309}
   m_Layer: 2
   m_Name: Mesh
   m_TagString: Untagged
@@ -259,6 +261,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!95 &5363453453808921309
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4800295624498294034}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 511712ecc30eade47b117f4d2627cebd, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &2340644893474506994
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -316,7 +337,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1585503118760319381, guid: 959b2edf92c086346afbcbb212df908f, type: 3}
       propertyPath: fireRate
-      value: 0.1
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 1585503118760319381, guid: 959b2edf92c086346afbcbb212df908f, type: 3}
       propertyPath: launchStrength
@@ -495,7 +516,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a3557aef8562b746805c26336ddb6d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inkColor: {r: 1, g: 0, b: 0, a: 1}
+  inkColor: {r: 0, g: 1, b: 0, a: 1}
   radius: 0.5
   hardness: 0.3
   strength: 0.3

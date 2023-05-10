@@ -46,5 +46,5 @@ MonoBehaviour:
   projectilePrefab: {fileID: 5393962742692073304, guid: 8147c8318d77f974c9f85699fc8cb150, type: 3}
   fireRate: 0.5
   launchStrength: 5
-  xVariance: 0.1
-  yVariance: 0.1
+  xVariance: 0.3
+  yVariance: 0.3

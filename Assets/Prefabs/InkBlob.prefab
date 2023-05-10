@@ -92,7 +92,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5393962742692073304}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: a5a9de178eb31a2488480a424b50dec9, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -126,10 +126,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d196c9a5e3ceaf340be2c790a463c8eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: {x: 0, y: 1, z: 0}
-  radius: 1
+  team: {x: 1, y: 0, z: 0}
+  radius: 1.49
   hardness: 0
-  strength: 0.1
+  strength: 0.2
 --- !u!114 &-649716097143579931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,4 +142,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 837801a5788cf7c47ba60e5c3178d38c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stickTime: 0.3
+  maxLifetime: 5
+  stickTime: 0.1

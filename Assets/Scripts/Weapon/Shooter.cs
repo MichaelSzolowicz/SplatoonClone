@@ -46,7 +46,10 @@ public class Shooter : MonoBehaviour
         Rigidbody rigidbody = obj.GetComponent<Rigidbody>();
         if(rigidbody)
         {
-            rigidbody.AddForce(transform.forward * launchStrength, ForceMode.Impulse);
+            Vector3 direction = transform.forward;
+            direction.x += Random.Range(0f, xVariance);
+            direction.y += Random.Range(0f, yVariance);
+            rigidbody.AddForce(direction.normalized * launchStrength, ForceMode.Impulse);
         }
     }
 }

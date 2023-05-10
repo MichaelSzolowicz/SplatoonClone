@@ -5,15 +5,24 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     [SerializeField]
-    protected float stickTime;
+    protected float maxLifetime, stickTime;
+
+    protected void Start()
+    {
+        Invoke("DestroySelf", maxLifetime);
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
         Invoke("DestroySelf", stickTime);
+        GetComponent<MeshRenderer>().enabled = false;
     }
 
     private void DestroySelf()
     {
-        Destroy(this.gameObject);
+        if(this)
+        {
+            Destroy(this.gameObject);
+        }
     }
 }
