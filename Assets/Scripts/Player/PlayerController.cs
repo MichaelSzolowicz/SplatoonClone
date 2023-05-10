@@ -58,17 +58,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Tooltip("True if the character is colliding.")]
     protected bool grounded;
 
-    [Header("==== Movement paramters ====")]
     /** Adjustable properties **/
-    [SerializeField]
-    protected float minSlopeGradation = .0f;
-    [SerializeField]
-    protected float slopeCheckTolerance = .01f;
-    [SerializeField]
-    protected float gravityScale = 1.0f;
-    protected float defaultGravityScale;
-    [SerializeField]
+    [Header("Movement"), SerializeField]
     protected float maxAcceleration = 1.0f;
+    protected float baseMaxAcceleration;
     [SerializeField]
     protected float maxHorizontalSpeed = 5.0f;
     protected float baseMaxHorizontalSpeed;
@@ -77,14 +70,29 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Tooltip("Constant force applied opposing input velocity.")]
     protected float braking = 0.0f;
     [SerializeField]
+    protected float wallClimbStrength;
+    [SerializeField]
+    protected float ledgeReducedAcceleration = 10.0f;
+
+    [Header("Gravity"), SerializeField]
+    protected float gravityScale = 1.0f;
+    protected float defaultGravityScale;
+
+    [Header("Slopes"), SerializeField]
+    protected float minSlopeGradation = .0f;
+    [SerializeField]
+    protected float slopeCheckTolerance = .01f;
+
+    [Header("Ink Detection"), SerializeField]
     protected float inkAlphaMinThreshold;
     [SerializeField]
     protected float updateMovementStateDelay = 0.032f;
     [SerializeField]
     protected float enemyInkSlowingFactor;
-
-    public float testGravMult;
-    public float testBrakeMult;
+    [SerializeField]
+    protected float swimSpeedMultiplier = 2f;
+    [SerializeField]
+    protected float downwardProbeDist = .4f;
 
     protected void Awake()
     {
@@ -99,31 +107,32 @@ public class PlayerController : MonoBehaviour
         //Default values
         defaultGravityScale = gravityScale;
         baseMaxHorizontalSpeed = maxHorizontalSpeed;
+        baseMaxAcceleration = maxAcceleration;
         currentMovementState = MovementState.Walking;
         isSquid = false;
 
         // Object initialization
         splatmapReader = new SplatmapReader();
 
-        // Important: Start movement state update loop.
+        /// Important: Start movement state update loop.
         Invoke("UpdateMovementState", .032f);
     }
 
     protected void Update()
     {
-        // Camera rotation
+        /// Camera rotation
         Vector2 mouseDelta = playerControls.Walking.Camera.ReadValue<Vector2>();
         cameraControls.CameraUpdate(mouseDelta.x, mouseDelta.y);
         mesh.transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, cameraControls.yRotation, transform.rotation.eulerAngles.z);
         shooter.transform.rotation = Quaternion.LookRotation(cameraControls.cameraTransform.forward);
 
+        /// Anim
         UpdateAnimation();
     }
 
     protected void FixedUpdate()
     {
         UpdatePhysics();
-        
     }
 
     /// <summary>
@@ -134,11 +143,10 @@ public class PlayerController : MonoBehaviour
     protected void UpdateMovementState()
     {
         SplatableObject splatObj;
-
-        // Forward probe
         RaycastHit hit;
         Vector3 origin = capsule.transform.TransformPoint(capsule.center);
-        //origin.y -= (capsule.radius);
+
+        /// Forward probe
         Ray ray = new Ray(origin, mesh.transform.forward);
         bool isValidHit = Physics.Raycast(ray, out hit, capsule.radius + .1f);
         surfaceProbeHit = hit;
@@ -149,9 +157,6 @@ public class PlayerController : MonoBehaviour
 
         if(isValidHit && currentMovementState != MovementState.EnemyInk)
         {
-            //print(hit.collider.gameObject.name);
-
-            
             splatObj = hit.collider.GetComponent<SplatableObject>();
             if(splatObj)
             {
@@ -160,28 +165,22 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // Downward probe.
-        hit = new RaycastHit();
-        origin = capsule.transform.TransformPoint(capsule.center);
+        /// Downward probe.
         ray = new Ray(origin, Vector3.down);
-        isValidHit = Physics.Raycast(ray, out hit, capsule.height + capsule.radius + .1f);
+        isValidHit = Physics.Raycast(ray, out hit, capsule.height + capsule.radius + downwardProbeDist);
         surfaceProbeHit = hit;
 
         /** TESTONLY **/
-        Debug.DrawRay(ray.origin, ray.direction * (capsule.height + capsule.radius + .1f), Color.red, .1f);
+        Debug.DrawRay(ray.origin, ray.direction * (capsule.height + capsule.radius + downwardProbeDist), Color.red, .1f);
         /** ENDTEST **/
 
-        if (!isValidHit)
+        if (isValidHit)
         {
-            FinishUpdateMovementSate(Color.clear);
-            return;
-        }
-
-        splatObj = hit.collider.GetComponent<SplatableObject>();
-
-        if (splatObj)
-        {
-            splatmapReader.ReadPixel(splatObj.Splatmap, hit.textureCoord, FinishUpdateMovementSate);
+            splatObj = hit.collider.GetComponent<SplatableObject>();
+            if (splatObj)
+            {
+                splatmapReader.ReadPixel(splatObj.Splatmap, hit.textureCoord, FinishUpdateMovementSate);
+            }
         }
         else FinishUpdateMovementSate(Color.clear);
     }
@@ -197,45 +196,41 @@ public class PlayerController : MonoBehaviour
         // This function can be called late by SplatmapReader, so make sure this still exists before doing anything.
         if (!this) return;
 
-        //print(color);
-
-        if(surfaceProbeHit.collider && Vector3.Dot(surfaceProbeHit.normal, Vector3.up) - slopeCheckTolerance < minSlopeGradation)
+        /// Wall Swimming
+        if(surfaceProbeHit.collider && 
+            Vector3.Dot(surfaceProbeHit.normal, Vector3.up) - slopeCheckTolerance < minSlopeGradation
+            && color.a > inkAlphaMinThreshold && color.r > color.g && isSquid)
         {
-
-            if (color.a > inkAlphaMinThreshold && color.r > color.g &&  isSquid)
-            {
-                //print("WallSwimming");
-                currentMovementState = MovementState.WallSwimming;
-                //inputVelocity = Vector3.zero;
-                maxHorizontalSpeed = Mathf.SmoothStep(maxHorizontalSpeed, baseMaxHorizontalSpeed * 1f, .1f);
-                grounded = false;
-                Invoke("UpdateMovementState", updateMovementStateDelay);
-                return;
-            }
+            print("Wall Swimming");
+            currentMovementState = MovementState.WallSwimming;
+            maxHorizontalSpeed =  baseMaxHorizontalSpeed;
+            grounded = false;
+            Invoke("UpdateMovementState", updateMovementStateDelay);
+            return;
         }
 
-        // Enemy ink
+        /// Enemy ink
         if (color.a > inkAlphaMinThreshold && color.g > color.r)
         {
             if (currentMovementState == MovementState.EnemyInk)
             {
+                maxHorizontalSpeed = baseMaxHorizontalSpeed * enemyInkSlowingFactor; // Mathf.SmoothStep(maxHorizontalSpeed, baseMaxHorizontalSpeed * enemyInkSlowingFactor, smoothMaxSpeedDecrease);
                 Invoke("UpdateMovementState", updateMovementStateDelay);
                 return;
             }
             print("EnemyInk");
             currentMovementState = MovementState.EnemyInk;
-            maxHorizontalSpeed = baseMaxHorizontalSpeed * enemyInkSlowingFactor;
             isSquid = false;
             Invoke("UpdateMovementState", updateMovementStateDelay);
             return;
         }
 
-        // Swimming
+        /// Swimming
         if (color.a > inkAlphaMinThreshold && color.r > color.g && isSquid && grounded)
         {
             if(currentMovementState == MovementState.Swimming)
             {
-                maxHorizontalSpeed = Mathf.SmoothStep(maxHorizontalSpeed, baseMaxHorizontalSpeed * 2f, .5f);
+                maxHorizontalSpeed = baseMaxHorizontalSpeed * swimSpeedMultiplier;
                 Invoke("UpdateMovementState", updateMovementStateDelay);
                 return;
             }
@@ -246,15 +241,12 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Default case
+        /// Default case
         print("Walking");
         currentMovementState = MovementState.Walking;
-        maxHorizontalSpeed = Mathf.SmoothStep(maxHorizontalSpeed, baseMaxHorizontalSpeed, .2f);  //baseMaxHorizontalSpeed;
-        if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
- 
+        maxHorizontalSpeed = baseMaxHorizontalSpeed;
         
-
-        //print("Finished Update Movement State at "+ Time.time);
+        if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
 
         Invoke("UpdateMovementState", updateMovementStateDelay);
         return;
@@ -267,55 +259,43 @@ public class PlayerController : MonoBehaviour
     private void GetInput() 
     {
         pendingInput = new Vector3(playerControls.Walking.MovementInput.ReadValue<Vector2>().x, 0, playerControls.Walking.MovementInput.ReadValue<Vector2>().y);
-        
-        //print(inputVelocity.y + verticalVelocity.y);
 
-        if (isSquid && currentMovementState == MovementState.WallSwimming  /*Vector3.Dot(surfaceProbeHit.normal, Vector3.up) - slopeCheckTolerance < minSlopeGradation && surfaceProbeHit.collider*/)
+        /// If we are wall swimming
+        if (isSquid && currentMovementState == MovementState.WallSwimming)
         {
-            //print("Wall Swimmming");
+            grounded = false;   // Wall swimming does not count as a grounded state.
 
-            grounded = false;
-            //gravityScale = 0;
-
+            // Not a big fan of vertical input being a vector 3. May change it to just a float for the y value.
             pendingVerticalInput = Quaternion.LookRotation(-surfaceProbeHit.normal, transform.up) * Quaternion.Euler(-90f, 0, 0) * pendingInput;
             pendingVerticalInput.x = 0; pendingVerticalInput.z = 0;
+
             pendingInput = Quaternion.LookRotation(-surfaceProbeHit.normal, transform.up) * Quaternion.Euler(-90f, 0, 0) * pendingInput;
             pendingInput.y = 0;
-
-            //maxHorizontalSpeed = baseMaxHorizontalSpeed;
-
-            //print("pen inp" + pendingInput);
         }
-        else if(isSquid && !surfaceProbeHit.collider && verticalVelocity.y < 0f)
-        {
-            maxAcceleration = 999f;
-            print("peak");
-            pendingInput = Quaternion.LookRotation(mesh.transform.forward, Vector3.up) * pendingInput;
-        }
-        else if(isSquid && !surfaceProbeHit.collider && !grounded)
+        /// Else, if we midair
+        else if (isSquid && !surfaceProbeHit.collider && !grounded)
         {
             grounded = false;
-            print("Floating");
             pendingInput = Quaternion.LookRotation(mesh.transform.forward, Vector3.up) * pendingInput;
 
-            maxAcceleration = 10f;
-
-            gravityScale = defaultGravityScale;
-
-            //pendingInput = Quaternion.LookRotation(mesh.transform.forward, Vector3.up) * pendingInput;
+            /// Reduce our horizontal accel slightly so we fly straight up a bit before coming down and landing on the ledge.
+            maxAcceleration = ledgeReducedAcceleration;
         }
+        /// Else if we are falling downwards.
+        else if(isSquid && !surfaceProbeHit.collider && verticalVelocity.y < 0f)
+        {
+            maxAcceleration = baseMaxAcceleration;
+            pendingInput = Quaternion.LookRotation(mesh.transform.forward, Vector3.up) * pendingInput;
+        }
+        /// Else default case
         else
         {
             //print("else");
-            braking = 20;
-            maxAcceleration = 999f;
+            maxAcceleration = baseMaxAcceleration;
             gravityScale = defaultGravityScale;
-            //maxHorizontalSpeed = baseMaxHorizontalSpeed;
             pendingInput = Quaternion.LookRotation(mesh.transform.forward, Vector3.up) * pendingInput;
         }
 
-
-        //pendingInput = Vector3.zero;
         Debug.DrawLine(transform.position, transform.position + pendingInput * 5, Color.red, .1f); 
     }
 
@@ -324,21 +304,16 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     protected void UpdatePhysics() 
     {
-
         GetInput();
         AddInputForce(pendingInput * inputStrength);
         AddFriction();
 
         // Calc acceleration, Ignoring mass.
         Vector3 a = pendingInputForce;
-
         if (a.magnitude >= maxAcceleration) a = a.normalized * maxAcceleration;
-        if ((inputVelocity + a * Time.deltaTime).magnitude > maxHorizontalSpeed)
-        {     
-            a = ((a.normalized * maxHorizontalSpeed - inputVelocity) / Time.deltaTime);
-        }
       
         inputVelocity += a * Time.fixedDeltaTime;
+        if (inputVelocity.magnitude > maxHorizontalSpeed) inputVelocity = inputVelocity.normalized * maxHorizontalSpeed;
 
         Vector3 delta = inputVelocity * Time.fixedDeltaTime;
 
@@ -355,17 +330,24 @@ public class PlayerController : MonoBehaviour
         {
             verticalVelocity += Vector3.down * GRAVITY_CONSTANT * gravityScale * Time.fixedDeltaTime;
 
-            //if (verticalVelocity.y > 10f) verticalVelocity.y = 10f;
-
-            //print(verticalVelocity);
-
             delta += verticalVelocity * Time.fixedDeltaTime;
         }
 
-        //print("Delta: "+delta);
-
         transform.position += delta;
         pendingInputForce = Vector3.zero;
+    }
+
+    /// <summary>
+    /// Adds the provided force, and the internal pendingVerticalInput to pendingInputForce and pendingVerticalInput respectively.
+    /// Yes, this is very confusing. I wrote this while very tired and will fix it down the road if I decide to come back to this project.
+    /// </summary>
+    /// <param name="force"></param>
+    public void AddInputForce(Vector3 force)
+    {
+        verticalVelocity += pendingVerticalInput * Time.fixedDeltaTime * wallClimbStrength;
+        pendingVerticalInput = Vector3.zero;
+
+        pendingInputForce += force;
     }
 
     protected void OnCollisionExit(Collision collision)
@@ -414,16 +396,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void AddInputForce(Vector3 force) 
-    {
-
-        verticalVelocity += pendingVerticalInput * Time.fixedDeltaTime * testGravMult;
-
-        pendingVerticalInput = Vector3.zero;
-
-        pendingInputForce += force; 
-    }
-
     /// <summary>
     /// Going to keep this as a simple braking factor.
     /// Strong enough braking also keeps us from maintaining inputVelocity while running into walls.
@@ -449,7 +421,6 @@ public class PlayerController : MonoBehaviour
         print("Exit Squid");
 
         isSquid = false;
-        //print("Walking");
         currentMovementState = MovementState.Walking;
         maxHorizontalSpeed = baseMaxHorizontalSpeed;
     }
@@ -468,7 +439,6 @@ public class PlayerController : MonoBehaviour
 
     protected void UpdateAnimation()
     {
-
         if (currentMovementState == MovementState.EnemyInk) animator.SetBool("EnemyInk", true);
         else animator.SetBool("EnemyInk", false);
 
@@ -489,12 +459,10 @@ public class PlayerController : MonoBehaviour
         if (currentMovementState == MovementState.WallSwimming || currentMovementState == MovementState.Swimming)
         {
             mesh.GetComponent<MeshRenderer>().enabled = false;
-            //mesh.gameObject.SetActive(false);
         }
         else
         {
             mesh.GetComponent<MeshRenderer>().enabled = true;
-            //mesh.gameObject.SetActive(true);
         }
     }
 }   

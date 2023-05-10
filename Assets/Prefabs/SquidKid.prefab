@@ -46,7 +46,7 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
-  m_Height: 0.03
+  m_Height: 0
   m_Direction: 1
   m_Center: {x: 0, y: -0.5, z: 0}
 --- !u!54 &4800295623315155304
@@ -86,18 +86,19 @@ MonoBehaviour:
   currentMovementState: 0
   isSquid: 0
   grounded: 0
-  minSlopeGradation: 0.5
-  slopeCheckTolerance: 0.01
-  gravityScale: 1
   maxAcceleration: 999
   maxHorizontalSpeed: 5
   inputStrength: 999
   braking: 20
+  wallClimbStrength: 30
+  gravityScale: 1.55
+  minSlopeGradation: 0.5
+  slopeCheckTolerance: 0.01
   inkAlphaMinThreshold: 0.1
   updateMovementStateDelay: 0.032
   enemyInkSlowingFactor: 0.2
-  testGravMult: 1
-  testBrakeMult: 6.14
+  swimSpeedMultiplier: 2
+  downwardProbeDist: 0.4
 --- !u!1 &4800295623397941644
 GameObject:
   m_ObjectHideFlags: 0
@@ -206,7 +207,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4800295624498294034}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4800295623397941651}
@@ -339,7 +340,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1585503118760319381, guid: 959b2edf92c086346afbcbb212df908f, type: 3}
       propertyPath: fireRate
-      value: 0.07
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1585503118760319381, guid: 959b2edf92c086346afbcbb212df908f, type: 3}
+      propertyPath: xVariance
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1585503118760319381, guid: 959b2edf92c086346afbcbb212df908f, type: 3}
+      propertyPath: yVariance
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 1585503118760319381, guid: 959b2edf92c086346afbcbb212df908f, type: 3}
       propertyPath: launchStrength
@@ -380,7 +389,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1426702611128489020, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.5
+      value: 1.05
       objectReference: {fileID: 0}
     - target: {fileID: 1426702611128489020, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
       propertyPath: m_LocalPosition.z
@@ -430,13 +439,17 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1426702611845850313, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
+      propertyPath: m_TagString
+      value: MainCamera
+      objectReference: {fileID: 0}
     - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
       propertyPath: yMax
       value: 86
       objectReference: {fileID: 0}
     - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
       propertyPath: yMin
-      value: -6
+      value: -19
       objectReference: {fileID: 0}
     - target: {fileID: 4259088803797291680, guid: 75c3b337ccf048f4abde367525febe15, type: 3}
       propertyPath: Y_MAX
@@ -518,7 +531,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a3557aef8562b746805c26336ddb6d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inkColor: {r: 0, g: 1, b: 0, a: 1}
-  radius: 0.5
-  hardness: 0.3
-  strength: 0.3
+  inkColor: {r: 1, g: 0, b: 0, a: 1}
+  radius: 1.5
+  hardness: 0
+  strength: 0.1
