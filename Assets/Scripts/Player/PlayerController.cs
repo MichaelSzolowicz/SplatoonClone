@@ -235,12 +235,12 @@ public class PlayerController : MonoBehaviour
         {
             if(currentMovementState == MovementState.Swimming)
             {
+                maxHorizontalSpeed = Mathf.SmoothStep(maxHorizontalSpeed, baseMaxHorizontalSpeed * 2f, .5f);
                 Invoke("UpdateMovementState", updateMovementStateDelay);
                 return;
             }
             print("Swimming");
             currentMovementState = MovementState.Swimming;
-            maxHorizontalSpeed = baseMaxHorizontalSpeed * 2f;
             if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
             Invoke("UpdateMovementState", updateMovementStateDelay);
             return;
@@ -249,7 +249,7 @@ public class PlayerController : MonoBehaviour
         // Default case
         print("Walking");
         currentMovementState = MovementState.Walking;
-        maxHorizontalSpeed = Mathf.SmoothStep(maxHorizontalSpeed, baseMaxHorizontalSpeed, .1f);  //baseMaxHorizontalSpeed;
+        maxHorizontalSpeed = Mathf.SmoothStep(maxHorizontalSpeed, baseMaxHorizontalSpeed, .2f);  //baseMaxHorizontalSpeed;
         if (playerControls.Walking.Squid.IsPressed() && !isSquid) EnterSquid(new InputAction.CallbackContext());
  
         
