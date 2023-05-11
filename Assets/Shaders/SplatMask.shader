@@ -46,7 +46,6 @@ Shader "Unlit/SplatMask"
                 float4 vertex : SV_POSITION;
                 float4 worldPos : TEXCOORD0;
                 float2 uv : TEXCOORD1;
-                //float weight : TEXCOORD2;
                 
             };
 
@@ -67,11 +66,7 @@ Shader "Unlit/SplatMask"
             }
 
             float4 frag(v2f i) : SV_Target
-            {
-                //float w = distance(_SplatPos, i.vertex);
-                //return float4(0, 0, 0, i.weight);
-
-                
+            {  
                 float4 col = tex2D(_MainTex, i.uv);
                 float m = mask(i.worldPos, _SplatPos, _Radius, _Hardness);
                 float edge = m * _Strength;

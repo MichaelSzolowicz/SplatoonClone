@@ -21,7 +21,7 @@ public class PixelReader : MonoBehaviour
 
     protected void Start()
     {
-        Application.targetFrameRate = 60;
+        //Application.targetFrameRate = 60;
 
         StartCoroutine(ReadPixelContinous());
     }
@@ -91,7 +91,7 @@ public class PixelReader : MonoBehaviour
         tex.Apply();
 
         Color color = tex.GetPixel(0, 0);
-        //print("Reader: " + color);
+        print("Reader: " + color);
 
         Destroy(tex);
     }
